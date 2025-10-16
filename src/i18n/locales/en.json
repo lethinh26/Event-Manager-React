@@ -29,5 +29,21 @@
   "share": "Share",
   "export": "Export",
   "create-new-board": "Create new board",
-  "edit-this-board": "Edit this board"
+  "edit-this-board": "Edit this board",
+  "board": {
+    "message": "Board {{action}} successfully",
+    "create": "created",
+    "update": "updated"
+  },
+  "success": "Success",
+  "failed": "Failed",
+  "update-board": "Update board",
+  "create-board": "Create board",
+  "background": "Background",
+  "color": "Color",
+  "board-title": "Board title",
+  "please-provide-a-valid-board-title": "Please provide a valid board title",
+  "close": "Close",
+  "create": "Create",
+  "upload": "Upload"
 }

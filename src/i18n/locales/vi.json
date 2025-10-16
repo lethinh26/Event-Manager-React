@@ -29,5 +29,21 @@
   "create-new-board": "Tạo bảng mới",
   "edit-this-board": "Chỉnh sửa bảng",
   "settings": "Cài đặt",
-  "closed-boards": "Bảng đã đóng"
+  "closed-boards": "Bảng đã đóng",
+  "board": {
+    "message": "{{action}} bảng thành công",
+    "create": "Tạo",
+    "update": "Cập nhật"
+  },
+  "success": "Thành công",
+  "failed": "Thất bại",
+  "update-board": "Bảng cập nhật",
+  "create-board": "Tạo bảng",
+  "background": "Hình nền",
+  "color": "Màu sắc",
+  "board-title": "Tiêu đề bảng",
+  "please-provide-a-valid-board-title": "Vui lòng cung cấp tiêu đề hợp lệ",
+  "close": "Đóng",
+  "create": "Tạo",
+  "upload": "Tải lên"
 }
