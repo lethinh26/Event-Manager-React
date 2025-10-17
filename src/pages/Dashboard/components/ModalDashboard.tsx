@@ -11,6 +11,7 @@ type PropsType = {
     onOk: () => void
 }
 
+
 const ModalDashboard = ({open, isEditing, onCancel, onOk}: PropsType) => {
     const {t} = useTranslation()
     const backgrounds = ["board-default1.jpg", "board-default2.jpg", "board-default3.jpg"];

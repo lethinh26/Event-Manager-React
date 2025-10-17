@@ -7,7 +7,7 @@ import trello_light from "../../assets/trello-light.png";
 const Navbar = () => {
     return (
         <Header style={{ display: "flex", alignItems: "center", height: "48px"}}>
-            <div className="demo-logo" />
+            {/* <div className="demo-logo" /> */}
             <Menu theme="dark" mode="vertical">
                 <img src={trello_light} className="w-30"></img>
             </Menu>
