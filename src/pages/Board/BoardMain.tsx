@@ -1,14 +1,16 @@
 import React, { useState } from "react";
-import { Button, Card, Dropdown, Menu, Space, Typography } from "antd";
-import { EllipsisOutlined, PlusOutlined, FilterOutlined, StarOutlined, NumberOutlined, TableOutlined } from "@ant-design/icons";
+import { Button, Card, Checkbox, Dropdown, Input, Menu, Radio, Space, Typography } from "antd";
+import { EllipsisOutlined, PlusOutlined, FilterOutlined, StarOutlined, NumberOutlined, TableOutlined, StarFilled, CheckOutlined } from "@ant-design/icons";
 import useNotify from "../../hooks/useNotify";
 import { useTranslation } from "react-i18next";
 import ModalCloseBoard from "./components/ModalCloseBoard";
 import FilterBoard from "./components/FilterBoard";
 
+//NOTE: chưa làm handleTitleChange, handleItemCardChange
 const { Title, Text } = Typography;
 
 const BoardMain: React.FC = () => {
+    const [isStar, setIsStar] = useState(false);
     //modal
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { notify, contextHolder } = useNotify();
@@ -31,14 +33,32 @@ const BoardMain: React.FC = () => {
     const openFilter = () => setIsFilterOpen(true);
     const closeFilter = () => setIsFilterOpen(false);
 
+    //edit
+    const [editTitle, setEditTitle] = useState<string | null>(null);
+    const [editCardName, setEditCardName] = useState<number | null>(null);
 
-    
+    const handleEditTitle = (id: string) => {
+        setEditTitle(id);
+    };
+
+    const handleEditCard = (id: number) => {
+        setEditCardName(id);
+    };
+
+    //
+
     //
     const lists = [
         {
             id: "todo",
             title: "Todo",
-            cards: ["Thuê DJ", "Lên kịch bản chương trình", "Chuẩn bị kịch", "Kịch bản", "Thuê MC"],
+            cards: [
+                { name: "Thuê DJ", status: false },
+                { name: "Lên kịch bản chương trình", status: false },
+                { name: "Chuẩn bị kịch", status: true },
+                { name: "Kịch bản", status: true },
+                { name: "Thuê MC", status: false },
+            ],
         },
         { id: "inprogress", title: "In-progress", cards: [] },
     ];
@@ -57,19 +77,27 @@ const BoardMain: React.FC = () => {
                 <div className="max-w-full mx-auto">
                     <div className="flex items-center justify-between mb-6 m-[-48px] bg-gray-200 p-5">
                         <div className="flex items-center gap-4">
+                            <Button
+                                size="middle"
+                                icon={isStar ? <StarFilled className="!text-amber-400 !text-[20px]" /> : <StarOutlined className="!text-[20px]" />}
+                                onClick={() => setIsStar(!isStar)}
+                            ></Button>
+
                             <Title level={4} className="!m-0">
                                 Tổ chức sự kiện Year-end party !
                             </Title>
 
                             <Space size={8} className="ml-2">
-                                <Button size="small" icon={<StarOutlined />}></Button>
-                                <Button size="small" icon={<NumberOutlined />}>
-                                    {t("boar")}
-                                </Button>
-                                <Button size="small" icon={<TableOutlined />}>
-                                    {" "}
-                                    {t("table")}
-                                </Button>
+                                <Radio.Group size="small">
+                                    <Radio.Button value="list" defaultChecked>
+                                        {" "}
+                                        <NumberOutlined /> {t("boar")}{" "}
+                                    </Radio.Button>
+                                    <Radio.Button value="table">
+                                        {" "}
+                                        <TableOutlined /> {t("table")}{" "}
+                                    </Radio.Button>
+                                </Radio.Group>
                                 <Button size="small" danger onClick={showModal}>
                                     {t("close-this-board")}
                                 </Button>
@@ -88,7 +116,9 @@ const BoardMain: React.FC = () => {
                             <div key={list.id} className="w-72 flex-shrink-0">
                                 <div className="bg-white rounded-lg shadow-sm p-3">
                                     <div className="flex items-center justify-between mb-2">
-                                        <Text strong>{list.title}</Text>
+                                        <Text strong onDoubleClick={() => handleEditTitle(list.id)}>
+                                            {editTitle === list.id ? <Input value={list.title} onChange={(e) => handleTitleChange(e, list.id)} onBlur={() => setEditTitle(null)} /> : list.title}
+                                        </Text>
                                         <Dropdown overlay={menu} trigger={["click"]}>
                                             <Button type="text" size="small" icon={<EllipsisOutlined />} />
                                         </Dropdown>
@@ -98,8 +128,18 @@ const BoardMain: React.FC = () => {
                                         {list.cards.map((c, idx) => (
                                             <Card key={idx} size="small" className="rounded-md">
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs">✓</div>
-                                                    <div>{c}</div>
+                                                    {c.status ? (
+                                                        <Button shape="circle" color="green" variant="solid" icon={<CheckOutlined />}></Button>
+                                                    ) : (
+                                                        // <Checkbox checked={c.status} onChange={() => handleCheckboxChange(idx)}></Checkbox>
+                                                        // <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs">✓</div>
+                                                        // <div className="w-6 h-6 bg-gray-500 rounded-full flex items-center justify-center text-white text-xs"></div>
+                                                        <Button shape="circle" color="default" variant="outlined"></Button>
+
+                                                    )}
+                                                    <div onDoubleClick={() => handleEditCard(idx)}>
+                                                        {editCardName === idx ? <Input value={c.name} onChange={(e) => handleCardNameChange(e, idx)} onBlur={() => setEditCardName(null)} /> : c.name}
+                                                    </div>
                                                 </div>
                                             </Card>
                                         ))}
@@ -126,9 +166,7 @@ const BoardMain: React.FC = () => {
             </div>
 
             <ModalCloseBoard open={isModalOpen} onCancel={handleCancel} onOk={handleOk} />
-            <FilterBoard open={isFilterOpen} onClose={closeFilter}/>
-
-            
+            <FilterBoard open={isFilterOpen} onClose={closeFilter} />
         </>
     );
 };
