@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Button, Card, Checkbox, Dropdown, Input, Menu, Radio, Space, Typography } from "antd";
-import { EllipsisOutlined, PlusOutlined, FilterOutlined, StarOutlined, NumberOutlined, TableOutlined, StarFilled, CheckOutlined } from "@ant-design/icons";
+import { Button, Card, Dropdown, Input, Menu, Radio, Space, Typography } from "antd";
+import { EllipsisOutlined, PlusOutlined, FilterOutlined, StarOutlined, NumberOutlined, TableOutlined, StarFilled, CheckOutlined, InfoCircleOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import useNotify from "../../hooks/useNotify";
 import { useTranslation } from "react-i18next";
 import ModalCloseBoard from "./components/ModalCloseBoard";
 import FilterBoard from "./components/FilterBoard";
+import ModalDetailsCard from "./components/ModalDetailsCard";
 
 //NOTE: chưa làm handleTitleChange, handleItemCardChange
 const { Title, Text } = Typography;
@@ -12,19 +13,20 @@ const { Title, Text } = Typography;
 const BoardMain: React.FC = () => {
     const [isStar, setIsStar] = useState(false);
     //modal
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isModalCloseOpen, setIsModalCloseOpen] = useState(false);
     const { notify, contextHolder } = useNotify();
     const { t } = useTranslation();
 
-    const showModal = () => setIsModalOpen(true);
+    //close 
+    const openClose = () => setIsModalCloseOpen(true);
 
     const handleOk = () => {
-        setIsModalOpen(false);
+        setIsModalCloseOpen(false);
         notify(true, t("deleted-successfully"));
     };
 
     const handleCancel = () => {
-        setIsModalOpen(false);
+        setIsModalCloseOpen(false);
     };
 
     //filter
@@ -32,6 +34,13 @@ const BoardMain: React.FC = () => {
 
     const openFilter = () => setIsFilterOpen(true);
     const closeFilter = () => setIsFilterOpen(false);
+
+    //edit card modal
+
+    const [isEditCardOpen, setIsEditCardOpen] = useState(false);
+
+    const openEditCard = () => setIsEditCardOpen(true);
+    const closeEditCard = () => setIsEditCardOpen(false);
 
     //edit
     const [editTitle, setEditTitle] = useState<string | null>(null);
@@ -98,7 +107,7 @@ const BoardMain: React.FC = () => {
                                         <TableOutlined /> {t("table")}{" "}
                                     </Radio.Button>
                                 </Radio.Group>
-                                <Button size="small" danger onClick={showModal}>
+                                <Button size="small" danger onClick={openClose}>
                                     {t("close-this-board")}
                                 </Button>
                             </Space>
@@ -127,28 +136,43 @@ const BoardMain: React.FC = () => {
                                     <div className="space-y-3">
                                         {list.cards.map((c, idx) => (
                                             <Card key={idx} size="small" className="rounded-md">
-                                                <div className="flex items-center gap-2">
-                                                    {c.status ? (
-                                                        <Button shape="circle" color="green" variant="solid" icon={<CheckOutlined />}></Button>
-                                                    ) : (
-                                                        // <Checkbox checked={c.status} onChange={() => handleCheckboxChange(idx)}></Checkbox>
-                                                        // <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs">✓</div>
-                                                        // <div className="w-6 h-6 bg-gray-500 rounded-full flex items-center justify-center text-white text-xs"></div>
-                                                        <Button shape="circle" color="default" variant="outlined"></Button>
+                                                <div className="flex items-center gap-2 justify-between group">
+                                                    <div className="flex items-center gap-2">
+                                                        {c.status ? (
+                                                            <Button shape="circle" color="green" variant="solid" icon={<CheckOutlined />}></Button>
+                                                        ) : (
+                                                            // <Checkbox checked={c.status} onChange={() => handleCheckboxChange(idx)}></Checkbox>
+                                                            // <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs">✓</div>
+                                                            // <div className="w-6 h-6 bg-gray-500 rounded-full flex items-center justify-center text-white text-xs"></div>
+                                                            <Button shape="circle" color="default" variant="outlined"></Button>
+                                                        )}
+                                                        <div onDoubleClick={() => handleEditCard(idx)}>
+                                                            {editCardName === idx ? (
+                                                                <Input value={c.name} onChange={(e) => handleCardNameChange(e, idx)} onBlur={() => setEditCardName(null)} />
+                                                            ) : (
+                                                                <Text ellipsis={{ tooltip: true }} style={{width: 150}}>{c.name}</Text>
+                                                            )}
+                                                        </div>
+                                                    </div>
 
-                                                    )}
-                                                    <div onDoubleClick={() => handleEditCard(idx)}>
-                                                        {editCardName === idx ? <Input value={c.name} onChange={(e) => handleCardNameChange(e, idx)} onBlur={() => setEditCardName(null)} /> : c.name}
+                                                    <div className="flex items-center gap-2 ">
+                                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                                                            <InfoCircleOutlined className="!text-blue-500 text-[16px] font-bold"/>
+                                                        </div>
+                                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                                                            <EditOutlined className="!text-amber-500 text-[16px] font-bold" onClick={() => setIsEditCardOpen(true)}/>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </Card>
                                         ))}
-
-                                        {list.id !== "add" && (
-                                            <Button type="text" className="w-full text-left text-gray-500" icon={<PlusOutlined />}>
+                                        <div className="flex justify-between">
+                                            <Button type="text" className="text-left text-gray-500" icon={<PlusOutlined />}>
                                                 {t("add-a-card")}
                                             </Button>
-                                        )}
+                                            <DeleteOutlined className="!text-red-500 mr-2" onClick={openClose}/>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -165,8 +189,9 @@ const BoardMain: React.FC = () => {
                 </div>
             </div>
 
-            <ModalCloseBoard open={isModalOpen} onCancel={handleCancel} onOk={handleOk} />
+            <ModalCloseBoard open={isModalCloseOpen} onCancel={handleCancel} onOk={handleOk} />
             <FilterBoard open={isFilterOpen} onClose={closeFilter} />
+            <ModalDetailsCard open={isEditCardOpen} onCancel={closeEditCard} />
         </>
     );
 };
