@@ -1,71 +1,61 @@
+import React from "react";
 import { ArrowRightOutlined } from "@ant-design/icons";
 import { Drawer, Button, Space, Input, Typography, TimePicker } from "antd";
-import React, { useEffect, useState } from "react";
 import { DayPicker, type DateRange } from "react-day-picker";
-import type { RangeValue } from 'rc-picker/lib/interface';
-import dayjs, { Dayjs } from 'dayjs';
-
-const { Text } = Typography;
+import type { Dayjs } from "dayjs";
 
 import "react-day-picker/style.css";
-const { RangePicker } = TimePicker;
+import { useTranslation } from "react-i18next";
+
+const { Text } = Typography;
 
 type PropsType = {
     onClose: () => void;
     open: boolean;
 };
 
-const format = "HH:mm:ss";
+const FORMAT = "HH:mm:ss";
 
-const ModalDayPicker = ({ onClose, open }: PropsType) => {
-    //time
-    const [timeRange, setTimeRange] = useState<RangeValue<Dayjs>>(null);
-    
+const DrawerDayPicker: React.FC<PropsType> = ({ onClose, open }) => {
+    const {t} = useTranslation();
+    const [timeRange, setTimeRange] = React.useState<any>(null);
+    const [range, setRange] = React.useState<DateRange | undefined>();
 
-    //date
-    const [range, setRange] = useState<DateRange | undefined>();
-    const [startDate, setStartDate] = useState<string>("");
-    const [dueDate, setDueDate] = useState<string>("");
-
-    // useEffect(() => {
-    //     console.log(range?.from?.toLocaleDateString());
-    //     console.log(range?.to?.toLocaleDateString());
-    // }, [range]);
-
-    useEffect(() => {
-        console.log(timeRange);
-    }, [timeRange]);
-
-    const footer = () => {
-        return (
-            <Space direction="vertical" size={12} className="w-full">
-                <Button type="primary" className="w-full">
-                    Save
-                </Button>
-                <Button danger className="w-full">
-                    Remove
-                </Button>
-            </Space>
-        );
-    };
     return (
-        <Drawer title="Dates" placement="right" onClose={onClose} open={open} width={320} footer={footer()}>
+        <Drawer
+            title={t('dates')}
+            placement="right"
+            onClose={onClose}
+            open={open}
+            width={320}
+            footer={
+                <Space direction="vertical" size={12} className="w-full">
+                    <Button type="primary" block></Button>
+                    <Button danger block>
+                        {t('remove')}
+                    </Button>
+                </Space>
+            }
+        >
             <DayPicker mode="range" selected={range} onSelect={setRange} />
-            <Space direction="vertical" className="w-full mt-5">
-                <Text className="font-bold">Schedule</Text>
 
-                <Space direction="horizontal">
-                    <Input placeholder="DD/MM/YYYY" value={range?.from?.toLocaleDateString()} onChange={(e) => setStartDate(e.target.value)} style={{ width: "110px" }} />
-                    <ArrowRightOutlined className="mx-1.5"/>
-                    <Input placeholder="DD/MM/YYYY" value={range?.to?.toLocaleDateString()} onChange={(e) => setDueDate(e.target.value)} style={{ width: "110px" }} />
+            <Space direction="vertical" className="w-full mt-5">
+                <Text className="font-bold">{t('schedule')}</Text>
+
+                <Space>
+                    <Input
+                        readOnly
+                        style={{ width: 110 }}
+                    />
+                    <ArrowRightOutlined className="mx-1.5" />
+                    <Input placeholder="DD/MM/YYYY" value={range?.to ? range.to.toLocaleDateString() : ""} readOnly style={{ width: 110 }} />
                 </Space>
 
-                <Text className="font-bold">Time</Text>
-                <TimePicker.RangePicker format={format} showNow={true} onChange={(e)=>setTimeRange(e)}/>
+                <Text className="font-bold">{t('time')}</Text>
+                <TimePicker.RangePicker format={FORMAT} showNow onChange={setTimeRange} />
             </Space>
-
         </Drawer>
     );
 };
 
-export default ModalDayPicker;
+export default DrawerDayPicker;

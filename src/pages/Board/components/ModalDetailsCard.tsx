@@ -4,9 +4,6 @@ import { Editor } from "@tinymce/tinymce-react";
 import { ClockCircleOutlined, DownOutlined, MinusOutlined, TagOutlined } from "@ant-design/icons";
 import ModalDayPicker from "./DrawerDayPicker";
 import DrawerLabel from "./DrawerLabel";
-// import { Day, DayPicker } from "react-day-picker";
-
-import {} from "antd";
 import ModalMoveCard from "./ModalMoveCard";
 import useNotify from "../../../hooks/useNotify";
 import { useTranslation } from "react-i18next";
@@ -23,47 +20,26 @@ const ModalDetailsCard: React.FC<Props> = ({ open, onCancel }) => {
 
     const editorRef = useRef<unknown>(null);
 
-    // date picker
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-
-    const openDatePicker = (): void => {
-        setIsDatePickerOpen(true);
-    };
-
-    const closeDatePicker = (): void => {
-        setIsDatePickerOpen(false);
-    };
-
-    // label drawer
     const [isLabelDrawerOpen, setIsLabelDrawerOpen] = useState(false);
-    const closeLabelDrawer = (): void => {
-        setIsLabelDrawerOpen(false);
-    };
-    const openLabelDrawer = (): void => {
-        setIsLabelDrawerOpen(true);
-    };
-
-    // move card
     const [isMoveCardModalOpen, setIsMoveCardModalOpen] = useState(false);
-    const closeMoveCardModal = (): void => {
-        setIsMoveCardModalOpen(false);
-    };
-    const openMoveCardModal = (): void => {
-        setIsMoveCardModalOpen(true);
-    };
-
-    // delete
     const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
-    const openDelete = () => setIsModalDeleteOpen(true);
 
+    const openDatePicker = () => setIsDatePickerOpen(true);
+    const closeDatePicker = () => setIsDatePickerOpen(false);
+
+    const openLabelDrawer = () => setIsLabelDrawerOpen(true);
+    const closeLabelDrawer = () => setIsLabelDrawerOpen(false);
+
+    const openMoveCardModal = () => setIsMoveCardModalOpen(true);
+    const closeMoveCardModal = () => setIsMoveCardModalOpen(false);
+
+    const openDelete = () => setIsModalDeleteOpen(true);
     const handleOk = () => {
         setIsModalDeleteOpen(false);
         notify(true, t("deleted-successfully"));
     };
-
-    const handleCancel = () => {
-        setIsModalDeleteOpen(false);
-    };
+    const handleCancel = () => setIsModalDeleteOpen(false);
 
     return (
         <Modal open={open} onCancel={onCancel} footer={null} width={900} className="p-0">
@@ -82,15 +58,16 @@ const ModalDetailsCard: React.FC<Props> = ({ open, onCancel }) => {
                                     <Select.Option value="inprogress">IN-PROGRESS</Select.Option>
                                 </Select>
                             </div>
+
                             <div className="flex gap-2 mt-1">
-                                In list:
-                                <Button color="default" variant="solid" size="small" className="!bg-slate-300 !text-black !font-semibold !flex !items-center" onClick={openMoveCardModal}>
+                                {t('in-list')}
+                                <Button size="small" className="!bg-slate-300 !text-black !font-semibold !flex !items-center" onClick={openMoveCardModal}>
                                     In-progress <DownOutlined className="mt-1 text-[12px]" />
                                 </Button>
                             </div>
 
                             <div className="mt-5">
-                                <h4 className="font-semibold mb-2">Description</h4>
+                                <h4 className="font-semibold mb-2">{t('description')}</h4>
 
                                 <div className="border rounded-md" data-color-mode="light">
                                     <Editor
@@ -131,8 +108,8 @@ const ModalDetailsCard: React.FC<Props> = ({ open, onCancel }) => {
                                 </div>
 
                                 <div className="flex items-center gap-4 mt-4">
-                                    <Button type="primary">Save</Button>
-                                    <Button type="text">Cancel</Button>
+                                    <Button type="primary">{t('save')}</Button>
+                                    <Button type="text">{t('cancel')}</Button>
                                 </div>
                             </div>
                         </div>
@@ -142,14 +119,14 @@ const ModalDetailsCard: React.FC<Props> = ({ open, onCancel }) => {
                 <div className="w-48 p-6">
                     <div className="space-y-3">
                         <Button block type="default" icon={<TagOutlined />} onClick={openLabelDrawer}>
-                            Labels
+                            {t('labels')}
                         </Button>
-                        <Button block type="default" variant="solid" color="yellow" className="!text-black" icon={<ClockCircleOutlined />} onClick={openDatePicker}>
-                            Dates
+                        <Button block type="default" className="!text-black" icon={<ClockCircleOutlined />} onClick={openDatePicker}>
+                            {t('dates')}
                         </Button>
-                        <Divider size="small" />
-                        <Button block variant="solid" color="danger" danger icon={<MinusOutlined />} onClick={openDelete}>
-                            Delete
+                        <Divider />
+                        <Button block danger icon={<MinusOutlined />} onClick={openDelete}>
+                            {t('delete')}
                         </Button>
                     </div>
                 </div>

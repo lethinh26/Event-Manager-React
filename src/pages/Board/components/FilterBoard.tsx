@@ -1,46 +1,47 @@
-import { CalendarOutlined, ClockCircleOutlined } from "@ant-design/icons";
-import {  Drawer, Input, Checkbox, Select, Divider } from "antd";
 import React from "react";
+import { CalendarOutlined, ClockCircleOutlined } from "@ant-design/icons";
+import { Drawer, Input, Checkbox, Select, Divider } from "antd";
 import { useTranslation } from "react-i18next";
 
 type PropsType = {
-    open: boolean,
-    onClose: () => void   
-}
+    open: boolean;
+    onClose: () => void;
+};
 
-const FilterBoard = ({open, onClose}: PropsType) => {
-    const {t} = useTranslation()
+const FilterBoard: React.FC<PropsType> = ({ open, onClose }) => {
+    const { t } = useTranslation();
+
     return (
-        <Drawer title={t('filter')} placement="right" onClose={onClose} open={open} width={360}>
+        <Drawer title={t("filter")} placement="right" onClose={onClose} open={open} width={360}>
             <div className="space-y-4">
                 <div>
-                    <p className="font-bold">{t('keyword')}</p>
-                    <Input className="mt-2" placeholder={t('enter-a-keyword')} />
+                    <p className="font-bold">{t("keyword")}</p>
+                    <Input className="mt-2" placeholder={t("enter-a-keyword")} />
                 </div>
 
                 <Divider />
 
                 <div>
-                    <p className="font-bold">{t('card-status')}</p>
+                    <p className="font-bold">{t("card-status")}</p>
                     <div className="mt-3 space-y-2">
-                        <Checkbox>{t('marked-as-complete')}</Checkbox>
-                        <Checkbox>{t('not-marked-as-complete')}</Checkbox>
+                        <Checkbox>{t("marked-as-complete")}</Checkbox>
+                        <Checkbox>{t("not-marked-as-complete")}</Checkbox>
                     </div>
                 </div>
 
                 <Divider />
 
                 <div>
-                    <p className="font-bold">{"Due date"}</p>
+                    <p className="font-bold">{t('due-date')}</p>
                     <div className="mt-3 space-y-2 text-sm flex flex-col">
                         <Checkbox>
-                            <CalendarOutlined className="mr-2" /> {t('no-dates')}
+                            <CalendarOutlined className="mr-2" /> {t("no-dates")}
                         </Checkbox>
                         <Checkbox>
-                            <ClockCircleOutlined style={{ color: "#ff4d4f" }} className="mr-2" /> {t('overdue')}
+                            <ClockCircleOutlined style={{ color: "#ff4d4f" }} className="mr-2" /> {t("overdue")}
                         </Checkbox>
                         <Checkbox>
-                            <ClockCircleOutlined style={{ color: "#faad14" }} className="mr-2" /> {t('due-in-the-next-day')}
+                            <ClockCircleOutlined style={{ color: "#faad14" }} className="mr-2" /> {t("due-in-the-next-day")}
                         </Checkbox>
                     </div>
                 </div>
@@ -48,9 +49,9 @@ const FilterBoard = ({open, onClose}: PropsType) => {
                 <Divider />
 
                 <div>
-                    <p className="font-bold">{"Labels"}</p>
+                    <p className="font-bold">{t('labels')}</p>
                     <div className="mt-3 space-y-2">
-                        <Checkbox>{t('no-labels')}</Checkbox>
+                        <Checkbox>{t("no-labels")}</Checkbox>
 
                         <div className="flex flex-col gap-2 mt-2">
                             <label className="flex items-center gap-3">
@@ -69,7 +70,7 @@ const FilterBoard = ({open, onClose}: PropsType) => {
                             </label>
                         </div>
 
-                        <Select placeholder={t('select-labels')} className="w-full mt-2" />
+                        <Select placeholder={t("select-labels")} className="w-full mt-2" />
                     </div>
                 </div>
             </div>

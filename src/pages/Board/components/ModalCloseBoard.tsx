@@ -9,17 +9,20 @@ type PropsType = {
     onCancel: () => void;
 };
 
-const ModalCloseBoard = ({ open, onOk, onCancel }: PropsType) => {
-    const {t} = useTranslation()
+const ModalCloseBoard: React.FC<PropsType> = ({ open, onOk, onCancel }) => {
+    const { t } = useTranslation();
+
     return (
-        <Modal open={open} onCancel={onCancel} onOk={onOk} footer={null}>
+        <Modal open={open} onCancel={onCancel} footer={null}>
             <div className="flex justify-center items-center flex-col">
                 <WarningFilled className="!text-amber-400 text-[88px]" />
-                <h1 className="font-semibold text-3xl my-5">{t('are-you-sure')}</h1>
-                <h2 className="text-xl font-light mb-5">{t('you-wont-be-able-to-revert-this')}</h2>
+                <h1 className="font-semibold text-3xl my-5">{t("are-you-sure")}</h1>
+                <h2 className="text-xl font-light mb-5">{t("you-wont-be-able-to-revert-this")}</h2>
                 <div className="flex gap-2">
-                    <Button color="primary" variant="solid" onClick={onOk}>{t('yes-close-it')}</Button>
-                <Button color="danger" variant="solid" onClick={onCancel}>{t('cancel')}</Button>
+                    <Button type="primary" onClick={onOk}>
+                        {t("yes-close-it")}
+                    </Button>
+                    <Button onClick={onCancel}>{t("cancel")}</Button>
                 </div>
             </div>
         </Modal>
