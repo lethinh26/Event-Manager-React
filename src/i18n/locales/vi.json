@@ -8,7 +8,7 @@
   "dont-have-an-account": "Bạn chưa có tài khoản?",
   "register": "Đăng ký",
   "sign-in": "Đăng nhập",
-  "register-successful": "Đăng ký thành công",
+  "register-successfully": "Đăng ký thành công",
   "register-failed": "Đăng ký thất bại",
   "sign-up": "Đăng ký",
   "please-enter-username": "Vui lòng nhập tên người dùng",
@@ -86,5 +86,11 @@
   "select-destination": "Chọn điểm đến",
   "list": "Danh sách",
   "position": "Vị trí",
-  "move": "Di chuyển"
+  "move": "Di chuyển",
+  "email-already-exists": "Email đã tồn tại",
+  "invalid-email-or-password": "Email hoặc mật khẩu không hợp lệ",
+  "remember-me": "Ghi nhớ tôi",
+  "logged-out-successfully": "Đăng xuất thành công",
+  "please-select-a-background": "Vui lòng chọn hình nền",
+  "please-select-a-color": "Vui lòng chọn một màu"
 }

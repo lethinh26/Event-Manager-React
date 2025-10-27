@@ -1,0 +1,14 @@
+{
+  "users": [
+    {
+      "id": "93ab",
+      "username": "lpt",
+      "email": "lephuthinh387@gmail.com",
+      "password": "123456",
+      "created_at": "2025-10-22T07:46:25.205Z"
+    }
+  ],
+  "boards": [],
+  "lists": [],
+  "tasks": []
+}

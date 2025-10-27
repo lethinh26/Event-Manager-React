@@ -71,7 +71,7 @@ const ModalDetailsCard: React.FC<Props> = ({ open, onCancel }) => {
 
                                 <div className="border rounded-md" data-color-mode="light">
                                     <Editor
-                                        apiKey="om0p47k28i4hd84f7ink542qqybtkah8ak46k0i5h1jpocjh"
+                                        apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
                                         onInit={(_evt, editor) => (editorRef.current = editor)}
                                         initialValue="<p>This is the initial content of the editor.</p>"
                                         init={{

@@ -2,7 +2,7 @@ import { EditOutlined, StarOutlined, UnorderedListOutlined } from "@ant-design/i
 import { Button, Select } from "antd";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import ModalDashboard from "./components/ModalDashboard";
+import ModalDashboard from "./components/ModalCreateBoard";
 import useNotify from "../../hooks/useNotify";
 
 

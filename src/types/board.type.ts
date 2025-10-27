@@ -5,6 +5,7 @@ export interface BoardType {
     description: string;
     backdrop: string;
     is_starred: boolean;
+    is_closed: boolean;
     created_at: string;
 }
 
