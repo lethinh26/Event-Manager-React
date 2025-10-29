@@ -92,5 +92,8 @@
   "remember-me": "Ghi nhớ tôi",
   "logged-out-successfully": "Đăng xuất thành công",
   "please-select-a-background": "Vui lòng chọn hình nền",
-  "please-select-a-color": "Vui lòng chọn một màu"
+  "please-select-a-color": "Vui lòng chọn một màu",
+  "update": "Cập nhật",
+  "upload-failed": "Tải lên không thành công",
+  "upload-successful": "Tải lên thành công"
 }

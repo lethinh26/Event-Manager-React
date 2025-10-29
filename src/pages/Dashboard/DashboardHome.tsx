@@ -9,11 +9,14 @@ import useAppDispatch from "../../hooks/useAppDispatch";
 import ModalCreateBoard from "./components/ModalCreateBoard";
 import { thunkFetchUser } from "../../stores/slices/user/user.thunk";
 import { thunkFetchBoards } from "../../stores/slices/board/board.thunk";
+import { useNavigate } from "react-router";
 
 const DashboardHome = () => {
     // notify / transale
     const { notify, contextHolder } = useNotify();
     const { t } = useTranslation();
+
+    const navigate = useNavigate();
 
     // reducer
     const dispatch = useAppDispatch();
@@ -24,7 +27,6 @@ const DashboardHome = () => {
         dispatch(thunkFetchUser());
         dispatch(thunkFetchBoards(user?.id || ""));
     }, [dispatch, user?.id]);
-
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editId, setEditId] = useState<string | null>(null);
@@ -68,23 +70,32 @@ const DashboardHome = () => {
 
             <div className="flex gap-5 px-3 flex-wrap">
                 {boards.boards &&
-                    boards.boards.filter(board => !board.is_starred).map((b) => {
-                        return (
-                            <div
-                                key={b.id}
-                                className={`rounded bg-cover bg-center w-[270px] h-[130px] relative overflow-hidden group cursor-pointer`}
-                                style={{ backgroundImage: `url(${b.backdrop})` }}
-                            >
-                                <h1 className="absolute top-4 left-4 font-semibold stroke-neutral-500 shadow-gray-900 text-white text-shadow">
-                                    {b.title}
-                                </h1>
-                                <Button onClick={() => showModalEdit(b.id)} className="!bg-slate-800 !text-white !border-none absolute left-1/2 -translate-x-1/2 top-20 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <EditOutlined />
-                                    {t("edit-this-board")}
-                                </Button>
-                            </div>
-                        );
-                    })}
+                    boards.boards
+                        .filter((board) => !board.is_starred)
+                        .map((b) => {
+                            return (
+                                <div
+                                    key={b.id}
+                                    className={`rounded bg-cover bg-center w-[270px] h-[130px] relative overflow-hidden group cursor-pointer`}
+                                    style={{ backgroundImage: `url(${b.backdrop})` }}
+                                    onClick={() => navigate(`/board/${b.id}`)}
+                                >
+                                    <h1 className="absolute top-4 left-4 font-semibold stroke-neutral-500 shadow-gray-900 text-white text-shadow">
+                                        {b.title}
+                                    </h1>
+                                    <Button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            showModalEdit(b.id);
+                                        }}
+                                        className="!bg-slate-800 !text-white !border-none absolute left-1/2 -translate-x-1/2 top-20 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                        <EditOutlined />
+                                        {t("edit-this-board")}
+                                    </Button>
+                                </div>
+                            );
+                        })}
 
                 <div className="rounded bg-gray-300 w-[270px] h-[130px] flex justify-center items-center">
                     <Button className="!bg-transparent !border-[#6C757D]" onClick={showModal}>
@@ -114,7 +125,10 @@ const DashboardHome = () => {
                                     <h1 className="absolute top-4 left-4 font-semibold stroke-neutral-500 shadow-gray-900 text-white text-shadow">
                                         {b.title}
                                     </h1>
-                                    <Button onClick={() => showModalEdit(b.id)} className="!bg-slate-800 !text-white !border-none absolute left-1/2 -translate-x-1/2 top-20 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Button
+                                        onClick={() => showModalEdit(b.id)}
+                                        className="!bg-slate-800 !text-white !border-none absolute left-1/2 -translate-x-1/2 top-20 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
                                         <EditOutlined />
                                         {t("edit-this-board")}
                                     </Button>

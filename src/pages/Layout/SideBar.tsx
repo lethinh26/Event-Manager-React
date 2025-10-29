@@ -5,7 +5,7 @@ import Sider from "antd/es/layout/Sider";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Outlet } from "react-router";
-import imgTest from "../../../public/board-default1.jpg";
+import imgTest from "../../assets/board-default1.jpg";
 import useNotify from "../../hooks/useNotify";
 
 type PropsType = {

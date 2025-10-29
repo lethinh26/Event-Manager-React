@@ -26,7 +26,6 @@ const LoginPage: React.FC = () => {
 
     const onFinish = async (values: LoginUserType) => {
         // const userObj = { email: values.email, password: values.password };
-        console.log(values);
 
         try {
             const noti = await Api.user.login(values);

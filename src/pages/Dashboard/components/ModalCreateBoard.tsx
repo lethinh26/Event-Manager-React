@@ -7,6 +7,7 @@ import useAppDispatch from "../../../hooks/useAppDispatch";
 import { useSelector } from "react-redux";
 import type { StoreType } from "../../../stores";
 import { thunkPostBoard, thunkUpdateBoard } from "../../../stores/slices/board/board.thunk";
+import type { AggregationColor } from "antd/es/color-picker/color";
 
 type PropsType = {
     open: boolean;
@@ -34,31 +35,7 @@ const ModalCreateBoard = ({ open, editId, onCancel, onOk }: PropsType) => {
     const bgWatch = Form.useWatch("background", form);
     const colorWatch = Form.useWatch("color", form);
 
-    // const [selectedBg, setSelectedBg] = useState<string | null>(null);
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-
-    // useEffect(() => {
-    //     if (editId && board) {
-    //         form.setFieldsValue({
-    //             title: board.title,
-    //             background: board.backdrop,
-    //             color: board.color,
-    //         });
-    //         setSelectedBg(board.backdrop);
-    //     } else {
-    //         form.resetFields();
-    //     }
-
-    // }, [editId, board, form]);
-
-    // const handleBackgroundChange = (value: string) => {
-    //     if (value === "upload") {
-    //         setSelectedBg("upload");
-    //     } else {
-    //         setUploadedImage(null);
-    //         setSelectedBg(value);
-    //     }
-    // };
 
     useEffect(() => {
         if (uploadedImage !== null) {
@@ -66,6 +43,20 @@ const ModalCreateBoard = ({ open, editId, onCancel, onOk }: PropsType) => {
         }
         console.log(form);
     }, [uploadedImage, form]);
+
+    useEffect(() => {
+        if (editId && board) {
+            form.setFieldsValue({
+                title: board.title,
+                background: board.backdrop,
+                color: board.color,
+            });
+
+            if (!backgrounds.includes(board.backdrop)) {
+                setUploadedImage(board.backdrop);
+            }
+        }
+    }, [editId, board, form]);
 
     const onFinish = (values: FormValues) => {
         const board = {
@@ -89,12 +80,24 @@ const ModalCreateBoard = ({ open, editId, onCancel, onOk }: PropsType) => {
         onOk();
     };
 
+    const handleOnClose = () => {
+        setUploadedImage(null);
+        form.resetFields();
+    };
+
     return (
         <Modal
             open={open}
-            onCancel={() => { onCancel(); form.resetFields(); }}
+            onCancel={() => {
+                handleOnClose();
+                onCancel();
+            }}
             footer={null}
             width={520}
+            onOk={() => {
+                handleOnClose();
+                onOk();
+            }}
             title={
                 <div className="flex items-center justify-between">
                     <span className="text-lg font-semibold">{editId ? t("update-board") : t("create-board")}</span>
@@ -116,10 +119,7 @@ const ModalCreateBoard = ({ open, editId, onCancel, onOk }: PropsType) => {
                                         )}
                                     </Radio.Button>
                                 ))}
-                                <Radio.Button
-                                    value={uploadedImage}
-                                    className="!w-[100px] !h-[100px] rounded-lg overflow-hidden !p-0"
-                                >
+                                <Radio.Button value={uploadedImage} className="!w-[100px] !h-[100px] rounded-lg overflow-hidden !p-0">
                                     <UploadImage imageUrl={uploadedImage} setUrlImage={setUploadedImage} />
                                     {bgWatch === uploadedImage && (
                                         <span className="absolute right-1 top-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-white/95 shadow">
@@ -127,7 +127,6 @@ const ModalCreateBoard = ({ open, editId, onCancel, onOk }: PropsType) => {
                                         </span>
                                     )}
                                 </Radio.Button>
-                                {/* {selectedBg === "upload" && <UploadImage imageUrl={uploadedImage} setUrlImage={setUploadedImage} />} */}
                             </Space>
                         </Radio.Group>
                     </Form.Item>
@@ -144,14 +143,19 @@ const ModalCreateBoard = ({ open, editId, onCancel, onOk }: PropsType) => {
                                         )}
                                     </Radio.Button>
                                 ))}
-                                <ColorPicker
+                                {/* <ColorPicker
                                     allowClear
                                     showText={false}
                                     mode={["single", "gradient"]}
-                                    onChangeComplete={(color) => {
-                                        console.log(color.toCssString());
+                                    onChangeComplete={(color: AggregationColor) => {
+                                        if (color.isGradient()) {
+
+                                            console.log(color.getColors());
+                                        }else {
+                                            console.log(color.toHex());
+                                        }
                                     }}
-                                />
+                                /> */}
                             </Space>
                         </Radio.Group>
                     </Form.Item>
@@ -161,7 +165,13 @@ const ModalCreateBoard = ({ open, editId, onCancel, onOk }: PropsType) => {
                     </Form.Item>
 
                     <Space direction="horizontal" size="middle">
-                        <Button danger onClick={() => { onCancel(); form.resetFields(); }}>
+                        <Button
+                            danger
+                            onClick={() => {
+                                handleOnClose();
+                                onCancel();
+                            }}
+                        >
                             {t("close")}
                         </Button>
                         <Button type="primary" htmlType="submit">

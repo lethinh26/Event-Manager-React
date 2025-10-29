@@ -2,8 +2,8 @@ export interface BoardType {
     id: string;
     user_id: string;
     title: string;
-    description: string;
     backdrop: string;
+    color: string;
     is_starred: boolean;
     is_closed: boolean;
     created_at: string;
