@@ -1,7 +1,7 @@
-import { CheckOutlined, PlusOutlined } from "@ant-design/icons";
-import { message, Upload, type UploadFile, type UploadProps } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+import { Form, message, Upload, type UploadFile, type UploadProps } from "antd";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 type PropsType = {
@@ -12,6 +12,12 @@ type PropsType = {
 const UploadImage = ({ imageUrl, setUrlImage }: PropsType) => {
     const { t } = useTranslation();
     const [fileList, setFileList] = useState<UploadFile[]>([]);
+
+    useEffect(() => {
+        if (imageUrl) {
+            setFileList([{ uid: "-1", name: "image.png", status: "done", url: imageUrl }]);
+        }
+    }, [imageUrl]);
 
     const uploadImage: UploadProps["customRequest"] = (options) => {
         const { file, onProgress, onSuccess, onError } = options;
@@ -47,13 +53,7 @@ const UploadImage = ({ imageUrl, setUrlImage }: PropsType) => {
     // upload ảnh -> qua thẻ uplaod -> Upload gọi uploadImage(error, success) ->  xong Upload nhận onChange
     return (
         <div>
-            {imageUrl !== null ? (
-                <>
-                    <div className="relative !w-[100px] !h-[100px] rounded-lg overflow-hidden">
-                        <img src={imageUrl} alt="avatar" className="!w-[100px] !h-[100px] absolute inset-0 bg-center bg-cover" />
-                    </div>
-                </>
-            ) : (
+            <Form.Item name="uploadedImage" valuePropName="fileList">
                 <Upload
                     accept="image/*"
                     listType="picture-card"
@@ -65,10 +65,11 @@ const UploadImage = ({ imageUrl, setUrlImage }: PropsType) => {
                         const mapped = fileList.map((f) => (f.response?.secure_url && !f.url ? { ...f, url: f.response.secure_url } : f));
                         setFileList(mapped);
                     }}
+                    className={"[&_.ant-upload-list-item-thumbnail>img]:!object-cover"}
                 >
                     {fileList.length >= 1 ? null : uploadButton}
                 </Upload>
-            )}
+            </Form.Item>
         </div>
     );
 };
