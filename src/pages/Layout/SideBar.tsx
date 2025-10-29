@@ -4,9 +4,10 @@ import { Content } from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Outlet } from "react-router";
-import imgTest from "../../assets/board-default1.jpg";
+import { Outlet, useNavigate } from "react-router";
 import useNotify from "../../hooks/useNotify";
+import useAppSelector from "../../hooks/useAppSelector";
+import type { BoardType } from "../../types/board.type";
 
 type PropsType = {
     variant: "default" | "board";
@@ -16,6 +17,23 @@ const SideBar = ({ variant }: PropsType) => {
     const { notify, contextHolder } = useNotify();
     const { t } = useTranslation();
     const [collapsed, setCollapsed] = useState(false);
+    const navigate = useNavigate();
+
+    const board = useAppSelector((state) => state.board.boards);
+
+    const formatBackground = (b: BoardType) => {
+        if (b.backdrop) {
+            if (b.backdrop.startsWith("./src")) {
+                return { backgroundImage: `url(.${b.backdrop})` };
+            } else if (b.backdrop.startsWith("https")) {
+                return { backgroundImage: `url(${b.backdrop})` };
+            }
+        } else if (b.color) {
+            return { backgroundColor: b.color };
+        }
+
+        return {};
+    }
 
     const handleLogout = () => {
         notify(true, t("logged-out-successfully"));
@@ -43,7 +61,21 @@ const SideBar = ({ variant }: PropsType) => {
                     <div>{t("your-boards")}</div>
                     <PlusOutlined className="cursor-pointer" />
                 </div>
-                <Menu.Item key={"abc"}>
+                {board?.map((b) => {
+                    return (
+                        <Menu.Item key={b.id}>
+                            <div className="flex items-center gap-2">
+                                <div
+                                    className="w-[24px] h-[20px] bg-center bg-no-repeat bg-cover"
+                                    style={formatBackground(b)}
+                                />
+                                <span>{b.title}</span>
+                            </div>
+                        </Menu.Item>
+                    );
+                })}
+
+                {/* <Menu.Item key={"abc"}>
                     <div className="flex items-center gap-2">
                         <img src={imgTest} alt="" className="w-[24px] h-[20px]" />
                         <span>Tổ chức sự kiện ...</span>
@@ -54,13 +86,7 @@ const SideBar = ({ variant }: PropsType) => {
                         <img src={imgTest} alt="" className="w-[24px] h-[20px]" />
                         <span>Tổ chức sự kiện ...</span>
                     </div>
-                </Menu.Item>
-                <Menu.Item key={"abc"}>
-                    <div className="flex items-center gap-2">
-                        <img src={imgTest} alt="" className="w-[24px] h-[20px]" />
-                        <span>Tổ chức sự kiện ...</span>
-                    </div>
-                </Menu.Item>
+                </Menu.Item> */}
             </>
         );
 
@@ -72,7 +98,7 @@ const SideBar = ({ variant }: PropsType) => {
                     <Sider theme="dark" collapsible collapsed={collapsed} onCollapse={(set) => setCollapsed(set)} breakpoint="lg" width={240}>
                         <Menu mode="inline" defaultSelectedKeys={["1"]} defaultOpenKeys={["sub1"]} theme="dark">
                             <div className={`px-3 mt-5 ${collapsed && "hidden"}`}>{t("your-workspaces")}</div>
-                            <Menu.Item key={1} icon={<UnorderedListOutlined />} className="!mt-5">
+                            <Menu.Item key={1} icon={<UnorderedListOutlined />} className="!mt-5" onClick={() => navigate("/dashboard")}>
                                 {t("boards")}
                             </Menu.Item>
                             <Menu.Item key={2} icon={<StarOutlined />}>

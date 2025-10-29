@@ -48,6 +48,16 @@
       "is_starred": false,
       "is_closed": false,
       "created_at": "2025-10-29T00:21:22.774Z"
+    },
+    {
+      "id": "3498ffcf-8579-42e2-a234-fcec61776858",
+      "user_id": "bf19faee-7fba-4362-9861-0d8914248748",
+      "title": "gegw",
+      "backdrop": null,
+      "color": "#E11D48",
+      "is_starred": false,
+      "is_closed": false,
+      "created_at": "2025-10-29T02:28:15.520Z"
     }
   ],
   "lists": [],

@@ -1,5 +1,5 @@
-import { Button, ColorPicker, Form, Input, Modal, Radio, Space } from "antd";
-import { useEffect, useState } from "react";
+import { Button, Form, Input, Modal, Radio, Space } from "antd";
+import { useEffect, useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import UploadImage from "./UploadImage";
 import { CheckOutlined } from "@ant-design/icons";
@@ -7,7 +7,6 @@ import useAppDispatch from "../../../hooks/useAppDispatch";
 import { useSelector } from "react-redux";
 import type { StoreType } from "../../../stores";
 import { thunkPostBoard, thunkUpdateBoard } from "../../../stores/slices/board/board.thunk";
-import type { AggregationColor } from "antd/es/color-picker/color";
 
 type PropsType = {
     open: boolean;
@@ -29,7 +28,8 @@ const ModalCreateBoard = ({ open, editId, onCancel, onOk }: PropsType) => {
 
     const { t } = useTranslation();
     const [form] = Form.useForm();
-    const backgrounds = ["./src/assets/board-default1.jpg", "./src/assets/board-default2.jpg", "./src/assets/board-default3.jpg"];
+
+    const backgrounds  = ["./src/assets/board-default1.jpg", "./src/assets/board-default2.jpg", "./src/assets/board-default3.jpg"];
     const colors = ["#FF8A00", "#E11D48", "#10B981", "#22D3EE", "#EAB308", "#8B5CF6"];
 
     const bgWatch = Form.useWatch("background", form);
@@ -37,11 +37,15 @@ const ModalCreateBoard = ({ open, editId, onCancel, onOk }: PropsType) => {
 
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
 
+
+    useEffect(() => {
+        console.log(bgWatch);
+    }, [bgWatch]);
+
     useEffect(() => {
         if (uploadedImage !== null) {
             form.setFieldsValue({ background: uploadedImage });
         }
-        console.log(form);
     }, [uploadedImage, form]);
 
     useEffect(() => {
@@ -52,7 +56,7 @@ const ModalCreateBoard = ({ open, editId, onCancel, onOk }: PropsType) => {
                 color: board.color,
             });
 
-            if (!backgrounds.includes(board.backdrop)) {
+            if (board.backdrop && !backgrounds.includes(board.backdrop)) {
                 setUploadedImage(board.backdrop);
             }
         }
@@ -63,8 +67,8 @@ const ModalCreateBoard = ({ open, editId, onCancel, onOk }: PropsType) => {
             id: crypto.randomUUID(),
             user_id: user?.id || "",
             title: values.title,
-            backdrop: values.background,
-            color: values.color,
+            backdrop: values.background || null, 
+            color: values.background ? null : values.color,
             is_starred: false,
             is_closed: false,
             created_at: new Date().toISOString(),
@@ -83,6 +87,18 @@ const ModalCreateBoard = ({ open, editId, onCancel, onOk }: PropsType) => {
     const handleOnClose = () => {
         setUploadedImage(null);
         form.resetFields();
+    };
+
+    const handleBackgroundChange = (value: string) => {
+        if (value) {
+            form.resetFields(["color"]);
+        }
+    };
+
+    const handleColorChange = (value: string) => {
+        if (value) {
+            form.resetFields(["background"]);
+        }
     };
 
     return (
@@ -106,8 +122,21 @@ const ModalCreateBoard = ({ open, editId, onCancel, onOk }: PropsType) => {
         >
             <Form form={form} onFinish={onFinish} layout="vertical">
                 <Space direction="vertical" size="large" style={{ width: "100%" }}>
-                    <Form.Item label={t("background")} name="background" rules={[{ required: true, message: t("please-select-a-background") }]}>
-                        <Radio.Group>
+                    <Form.Item
+                        label={t("background")}
+                        name="background"
+                        rules={[
+                            {
+                                validator: (_, value) => {
+                                    if (value || form.getFieldValue("color")) {
+                                        return Promise.resolve();
+                                    }
+                                    return Promise.reject(new Error(t('please-select-a-background-or-color')));
+                                },
+                            },
+                        ]}
+                    >
+                        <Radio.Group onChange={(e) => handleBackgroundChange(e.target.value)}>
                             <Space size="middle">
                                 {backgrounds.map((src) => (
                                     <Radio.Button key={src} value={src} className="relative !w-[100px] !h-[100px] rounded-lg overflow-hidden">
@@ -131,8 +160,21 @@ const ModalCreateBoard = ({ open, editId, onCancel, onOk }: PropsType) => {
                         </Radio.Group>
                     </Form.Item>
 
-                    <Form.Item label={t("color")} name="color" rules={[{ required: true, message: t("please-select-a-color") }]}>
-                        <Radio.Group>
+                    <Form.Item
+                        label={t("color")}
+                        name="color"
+                        rules={[
+                            {
+                                validator: (_, value) => {
+                                    if (value || form.getFieldValue("background")) {
+                                        return Promise.resolve();
+                                    }
+                                    return Promise.reject(new Error(t("please-select-a-background-or-color")));
+                                },
+                            },
+                        ]}
+                    >
+                        <Radio.Group onChange={(e) => handleColorChange(e.target.value)}>
                             <Space size="small">
                                 {colors.map((hex) => (
                                     <Radio.Button key={hex} value={hex} className="relative !w-12 !h-9 rounded-md" style={{ backgroundColor: hex }}>
@@ -143,19 +185,6 @@ const ModalCreateBoard = ({ open, editId, onCancel, onOk }: PropsType) => {
                                         )}
                                     </Radio.Button>
                                 ))}
-                                {/* <ColorPicker
-                                    allowClear
-                                    showText={false}
-                                    mode={["single", "gradient"]}
-                                    onChangeComplete={(color: AggregationColor) => {
-                                        if (color.isGradient()) {
-
-                                            console.log(color.getColors());
-                                        }else {
-                                            console.log(color.toHex());
-                                        }
-                                    }}
-                                /> */}
                             </Space>
                         </Radio.Group>
                     </Form.Item>

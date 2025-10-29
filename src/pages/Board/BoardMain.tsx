@@ -72,7 +72,11 @@ const BoardMain: React.FC = () => {
                 <div className="max-w-full mx-auto">
                     <div className="flex items-center justify-between mb-6 m-[-48px] bg-gray-200 p-5">
                         <div className="flex items-center gap-4">
-                            <Button size="middle" icon={isStar ? <StarFilled className="!text-amber-400 !text-[20px]" /> : <StarOutlined className="!text-[20px]" />} onClick={toggleStar} />
+                            <Button
+                                size="middle"
+                                icon={isStar ? <StarFilled className="!text-amber-400 !text-[20px]" /> : <StarOutlined className="!text-[20px]" />}
+                                onClick={toggleStar}
+                            />
 
                             <Title level={4} className="!m-0">
                                 Tổ chức sự kiện Year-end party !
@@ -104,7 +108,15 @@ const BoardMain: React.FC = () => {
                                 <div className="bg-white rounded-lg shadow-sm p-3">
                                     <div className="flex items-center justify-between mb-2">
                                         <Text strong onDoubleClick={() => handleEditTitle(list.id)}>
-                                            {editTitle === list.id ? <Input value={list.title} onChange={(e) => handleTitleChange(e, list.id)} onBlur={() => setEditTitle(null)} /> : list.title}
+                                            {editTitle === list.id ? (
+                                                <Input
+                                                    value={list.title}
+                                                    onChange={(e) => handleTitleChange(e, list.id)}
+                                                    onBlur={() => setEditTitle(null)}
+                                                />
+                                            ) : (
+                                                list.title
+                                            )}
                                         </Text>
                                         <Dropdown overlay={menu} trigger={["click"]}>
                                             <Button type="text" size="small" icon={<EllipsisOutlined />} />
@@ -124,7 +136,11 @@ const BoardMain: React.FC = () => {
                                                         />
                                                         <div onDoubleClick={() => handleEditCard(idx)}>
                                                             {editCardName === idx ? (
-                                                                <Input value={c.name} onChange={(e) => handleCardNameChange(e, idx)} onBlur={() => setEditCardName(null)} />
+                                                                <Input
+                                                                    value={c.name}
+                                                                    onChange={(e) => handleCardNameChange(e, idx)}
+                                                                    onBlur={() => setEditCardName(null)}
+                                                                />
                                                             ) : (
                                                                 <Text ellipsis={{ tooltip: true }} style={{ width: 150 }}>
                                                                     {c.name}

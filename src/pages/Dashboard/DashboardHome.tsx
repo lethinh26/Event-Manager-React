@@ -10,6 +10,7 @@ import ModalCreateBoard from "./components/ModalCreateBoard";
 import { thunkFetchUser } from "../../stores/slices/user/user.thunk";
 import { thunkFetchBoards } from "../../stores/slices/board/board.thunk";
 import { useNavigate } from "react-router";
+import type { BoardType } from "../../types/board.type";
 
 const DashboardHome = () => {
     // notify / transale
@@ -52,6 +53,15 @@ const DashboardHome = () => {
         setIsModalOpen(false);
     };
 
+    const getBackground = (b: BoardType) =>
+        b.backdrop
+            ? {
+                  backgroundImage: `url(${b.backdrop})`,
+              }
+            : {
+                  backgroundColor: b.color || "#FFFFFF",
+              };
+
     return (
         <div>
             {contextHolder}
@@ -77,7 +87,7 @@ const DashboardHome = () => {
                                 <div
                                     key={b.id}
                                     className={`rounded bg-cover bg-center w-[270px] h-[130px] relative overflow-hidden group cursor-pointer`}
-                                    style={{ backgroundImage: `url(${b.backdrop})` }}
+                                    style={{...getBackground(b)}}
                                     onClick={() => navigate(`/board/${b.id}`)}
                                 >
                                     <h1 className="absolute top-4 left-4 font-semibold stroke-neutral-500 shadow-gray-900 text-white text-shadow">
