@@ -22,7 +22,7 @@ const LoginPage: React.FC = () => {
             }
         };
         checkLogin();
-    }, []);
+    }, [navigate]);
 
     const onFinish = async (values: LoginUserType) => {
         // const userObj = { email: values.email, password: values.password };
@@ -42,7 +42,6 @@ const LoginPage: React.FC = () => {
 
     const onFinishFailed = (errorInfo: ValidateErrorEntity<LoginUserType>) => {
         notify(false, `${t("login-failed")}\n${errorInfo}`);
-        console.log("Failed:", errorInfo);
     };
 
     return (

@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { Button, Card, Dropdown, Input, Menu, Radio, Space, Typography } from "antd";
+import React, { useEffect, useState } from "react";
+import { Button, Card, Dropdown, Input, Radio, Space, Typography } from "antd";
+import type { MenuProps } from "antd";
 import {
     EllipsisOutlined,
     PlusOutlined,
@@ -12,58 +13,197 @@ import {
     InfoCircleOutlined,
     EditOutlined,
     DeleteOutlined,
+    CloseOutlined,
 } from "@ant-design/icons";
 import useNotify from "../../hooks/useNotify";
 import { useTranslation } from "react-i18next";
 import ModalCloseBoard from "./components/ModalCloseBoard";
 import FilterBoard from "./components/FilterBoard";
 import ModalDetailsCard from "./components/ModalDetailsCard";
+import { ModalInfoTask } from "./components/ModalInfoTask";
+import { useNavigate, useParams } from "react-router";
+import { useBoard } from "../../hooks/useBoard";
+import useAppSelector from "../../hooks/useAppSelector";
+import { selectAllLists, selectAllTasks } from "../../stores/slices/boardEntity/boardEntity.slice";
+import type { ListType, TaskType } from "../../types/board.type";
+import useAppDispatch from "../../hooks/useAppDispatch";
+import { thunkDelete, thunkGet, thunkPost, thunkUpdate } from "../../stores/slices/boardEntity/boardEntity.thunk";
 
 const { Title, Text } = Typography;
 
 const BoardMain: React.FC = () => {
-    const [isStar, setIsStar] = useState(false);
-    const [isModalCloseOpen, setIsModalCloseOpen] = useState(false);
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const [isEditCardOpen, setIsEditCardOpen] = useState(false);
+    const navigate = useNavigate();
+    const { id } = useParams();
+    const dispatch = useAppDispatch();
+    const board = useBoard();
+    const lists: ListType[] = useAppSelector(selectAllLists);
+    const tasks: TaskType[] = useAppSelector(selectAllTasks);
+    const isLoading = useAppSelector((state) => state.boardEntity.loading);
+
+    const [isStar, setIsStar] = useState<boolean>(false);
+    const [isModalCloseOpen, setIsModalCloseOpen] = useState<boolean>(false);
+    const [isModalDeleteListOpen, setIsModalDeleteListOpen] = useState<boolean>(false);
+    const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
+    const [isEditCardOpen, setIsEditCardOpen] = useState<boolean>(false);
+    const [isInfoTaskOpen, setIsInfoTaskOpen] = useState<boolean>(false);
+    const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
     const [editTitle, setEditTitle] = useState<string | null>(null);
-    const [editCardName, setEditCardName] = useState<number | null>(null);
+    const [editCardId, setEditCardId] = useState<string | null>(null);
+    const [selectedListId, setSelectedListId] = useState<string | null>(null);
+    const [createList, setCreateList] = useState<{ isShow: boolean; data: string }>({ isShow: false, data: "" });
+    const [createTask, setCreateTask] = useState<{ listId: string | null; title: string }>({ listId: null, title: "" });
 
     const { notify, contextHolder } = useNotify();
     const { t } = useTranslation();
 
-    const lists = [
-        {
-            id: "todo",
-            title: "Todo",
-            cards: [
-                { name: "Thuê DJ", status: false },
-                { name: "Lên kịch bản chương trình", status: false },
-                { name: "Chuẩn bị kịch", status: true },
-                { name: "Kịch bản", status: true },
-                { name: "Thuê MC", status: false },
-            ],
-        },
-        { id: "inprogress", title: "In-progress", cards: [] },
-    ];
+    const menu: MenuProps = {
+        items: [
+            { key: "1", label: t("edit") },
+            { key: "2", label: t("close") },
+        ],
+    };
 
-    const menu = (
-        <Menu>
-            <Menu.Item key="1">{t("edit")}</Menu.Item>
-            <Menu.Item key="2">{t("close")}</Menu.Item>
-        </Menu>
-    );
+    const toggleStar = () => {
+        setIsStar((prev) => !prev);
+        dispatch(
+            thunkUpdate({
+                location: "boards",
+                id: id!,
+                data: { is_starred: !isStar },
+            })
+        );
+    };
 
-    const toggleStar = () => setIsStar((prev) => !prev);
-
-    const handleModalClose = (success: boolean) => {
+    const handleModalClose = async (success: boolean) => {
+        if (success && currentBoard) {
+            try {
+                await dispatch(thunkUpdate({ location: "boards", id: currentBoard.id, data: { is_closed: true } }));
+                notify(true, t("board-closed-successfully"));
+                setTimeout(() => navigate("/dashboard"), 1000);
+            } catch {
+                notify(false, t("failed-to-close-board"));
+            }
+        }
         setIsModalCloseOpen(false);
-        if (success) notify(true, t("deleted-successfully"));
+    };
+
+    const handleModalDeleteList = (success: boolean) => {
+        if (success && selectedListId) {
+            const tasksInList = tasks.filter((t) => t.list_id === selectedListId);
+            tasksInList.forEach((task) => {
+                dispatch(thunkDelete({ location: "tasks", id: task.id }));
+            });
+            dispatch(thunkDelete({ location: "lists", id: selectedListId }));
+            notify(true, t("list-deleted-successfully"));
+            setSelectedListId(null);
+        }
+        setIsModalDeleteListOpen(false);
     };
 
     const handleEditTitle = (id: string) => setEditTitle(id);
 
-    const handleEditCard = (id: number) => setEditCardName(id);
+    const handleEditCard = (taskId: string) => setEditCardId(taskId);
+
+    const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>, listId: string) => {
+        const newTitle = e.target.value;
+        dispatch(thunkUpdate({ location: "lists", id: listId, data: { title: newTitle } }));
+    };
+
+    const handleTaskTitleChange = (e: React.ChangeEvent<HTMLInputElement>, taskId: string) => {
+        const newTitle = e.target.value;
+        dispatch(thunkUpdate({ location: "tasks", id: taskId, data: { title: newTitle } }));
+    };
+
+    const handleAddList = () => {
+        if (!createList.data.trim()) return;
+
+        const data: ListType = {
+            id: crypto.randomUUID(),
+            board_id: id!,
+            title: createList.data,
+            created_at: new Date().toISOString(),
+        };
+
+        dispatch(thunkPost({ location: "lists", data }));
+        setCreateList({ isShow: false, data: "" });
+    };
+
+    const handleAddTask = (listId: string) => {
+        if (!createTask.title.trim()) return;
+
+        const data: TaskType = {
+            id: crypto.randomUUID(),
+            list_id: listId,
+            title: createTask.title,
+            description: "",
+            status: false,
+            position: tasks.filter((t) => t.list_id === listId).length,
+            due_date: null,
+            created_at: new Date().toISOString(),
+        };
+
+        dispatch(thunkPost({ location: "tasks", data }));
+        setCreateTask({ listId: null, title: "" });
+    };
+
+    const handleTaskStatus = (task: TaskType) => {
+        dispatch(thunkUpdate({ location: "tasks", id: task.id, data: { status: !task.status } }));
+    };
+
+    const handleDeleteList = (listId: string) => {
+        setSelectedListId(listId);
+        setIsModalDeleteListOpen(true);
+    };
+
+    const handleOpenInfoTask = (task: TaskType) => {
+        setSelectedTask(task);
+        setIsInfoTaskOpen(true);
+    };
+
+    useEffect(() => {
+        if (id) {
+            dispatch(thunkGet({ location: "lists", idLocation: "board_id", id }));
+        }
+    }, [id, dispatch]);
+
+    useEffect(() => {
+        if (lists.length > 0) {
+            lists.forEach((list) => {
+                dispatch(thunkGet({ location: "tasks", idLocation: "list_id", id: list.id }));
+            });
+        }
+    }, [lists.length, dispatch]);
+
+    useEffect(() => {
+        if (tasks.length > 0) {
+            tasks.forEach((task) => {
+                dispatch(thunkGet({ location: "tags", idLocation: "task_id", id: task.id }));
+            });
+        }
+    }, [tasks.length, dispatch]);
+
+    useEffect(() => {
+        if (!id) {
+            navigate("/dashboard");
+        }
+    }, [id, navigate]);
+
+    const currentBoard = board?.find((b) => b.id === id);
+    const currentList: ListType[] = lists.filter((list) => list.board_id === id);
+
+    useEffect(() => {
+        if (currentBoard) {
+            setIsStar(currentBoard.is_starred);
+        }
+    }, [currentBoard]);
+
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
+
+    if (!id || !currentBoard) {
+        return null;
+    }
 
     return (
         <>
@@ -79,7 +219,7 @@ const BoardMain: React.FC = () => {
                             />
 
                             <Title level={4} className="!m-0">
-                                Tổ chức sự kiện Year-end party !
+                                {currentBoard?.title}
                             </Title>
 
                             <Space size={8} className="ml-2">
@@ -103,7 +243,7 @@ const BoardMain: React.FC = () => {
                     </div>
 
                     <div className="flex gap-4 overflow-x-auto pb-6">
-                        {lists.map((list) => (
+                        {currentList?.map((list) => (
                             <div key={list.id} className="w-72 flex-shrink-0">
                                 <div className="bg-white rounded-lg shadow-sm p-3">
                                     <div className="flex items-center justify-between mb-2">
@@ -118,67 +258,128 @@ const BoardMain: React.FC = () => {
                                                 list.title
                                             )}
                                         </Text>
-                                        <Dropdown overlay={menu} trigger={["click"]}>
+                                        <Dropdown menu={menu} trigger={["click"]}>
                                             <Button type="text" size="small" icon={<EllipsisOutlined />} />
                                         </Dropdown>
                                     </div>
 
                                     <div className="space-y-3">
-                                        {list.cards.map((c, idx) => (
-                                            <Card key={idx} size="small" className="rounded-md">
-                                                <div className="flex items-center gap-2 justify-between group">
-                                                    <div className="flex items-center gap-2">
-                                                        <Button
-                                                            shape="circle"
-                                                            color={c.status ? "green" : "default"}
-                                                            variant={c.status ? "solid" : "outlined"}
-                                                            icon={c.status ? <CheckOutlined /> : null}
-                                                        />
-                                                        <div onDoubleClick={() => handleEditCard(idx)}>
-                                                            {editCardName === idx ? (
-                                                                <Input
-                                                                    value={c.name}
-                                                                    onChange={(e) => handleCardNameChange(e, idx)}
-                                                                    onBlur={() => setEditCardName(null)}
-                                                                />
-                                                            ) : (
-                                                                <Text ellipsis={{ tooltip: true }} style={{ width: 150 }}>
-                                                                    {c.name}
-                                                                </Text>
-                                                            )}
+                                        {tasks
+                                            .filter((task) => task.list_id === list.id)
+                                            .sort((a, b) => a.position - b.position)
+                                            .map((task) => (
+                                                <Card key={task.id} size="small" className="rounded-md">
+                                                    <div className="flex items-center gap-2 justify-between group">
+                                                        <div className="flex items-center gap-2">
+                                                            <Button
+                                                                shape="circle"
+                                                                color={task.status ? "green" : "default"}
+                                                                variant={task.status ? "solid" : "outlined"}
+                                                                icon={task.status ? <CheckOutlined /> : null}
+                                                                onClick={() => handleTaskStatus(task)}
+                                                            />
+                                                            <div onDoubleClick={() => handleEditCard(task.id)}>
+                                                                {editCardId === task.id ? (
+                                                                    <Input
+                                                                        defaultValue={task.title}
+                                                                        onChange={(e) => handleTaskTitleChange(e, task.id)}
+                                                                        onBlur={() => setEditCardId(null)}
+                                                                        autoFocus
+                                                                    />
+                                                                ) : (
+                                                                    <Text ellipsis={{ tooltip: true }} style={{ width: 150 }}>
+                                                                        {task.title}
+                                                                    </Text>
+                                                                )}
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="flex items-center gap-2">
+                                                            <InfoCircleOutlined
+                                                                className="!text-blue-500 text-[16px] font-bold opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                                                                onClick={() => handleOpenInfoTask(task)}
+                                                            />
+                                                            <EditOutlined
+                                                                className="!text-amber-500 text-[16px] font-bold opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                                                                onClick={() => {
+                                                                    setSelectedTask(task);
+                                                                    setIsEditCardOpen(true);
+                                                                }}
+                                                            />
                                                         </div>
                                                     </div>
+                                                </Card>
+                                            ))}
 
-                                                    <div className="flex items-center gap-2">
-                                                        {[InfoCircleOutlined, EditOutlined].map((Icon, i) => (
-                                                            <Icon
-                                                                key={i}
-                                                                className={`!text-${
-                                                                    i === 0 ? "blue" : "amber"
-                                                                }-500 text-[16px] font-bold opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer`}
-                                                                onClick={i === 1 ? () => setIsEditCardOpen(true) : undefined}
-                                                            />
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            </Card>
-                                        ))}
-                                        <div className="flex justify-between">
-                                            <Button type="text" className="text-left text-gray-500" icon={<PlusOutlined />}>
-                                                {t("add-a-card")}
-                                            </Button>
-                                            <DeleteOutlined className="!text-red-500 mr-2 cursor-pointer" onClick={() => setIsModalCloseOpen(true)} />
-                                        </div>
+                                        {createTask.listId === list.id ? (
+                                            <div className="space-y-2">
+                                                <Input
+                                                    placeholder={t("enter-card-title")}
+                                                    value={createTask.title}
+                                                    onChange={(e) => setCreateTask({ ...createTask, title: e.target.value })}
+                                                    onPressEnter={() => handleAddTask(list.id)}
+                                                    autoFocus
+                                                />
+                                                <Space>
+                                                    <Button size="small" type="primary" onClick={() => handleAddTask(list.id)}>
+                                                        {t("add-card")}
+                                                    </Button>
+                                                    <CloseOutlined
+                                                        className="cursor-pointer"
+                                                        onClick={() => setCreateTask({ listId: null, title: "" })}
+                                                    />
+                                                </Space>
+                                            </div>
+                                        ) : (
+                                            <div className="flex justify-between">
+                                                <Button
+                                                    type="text"
+                                                    className="text-left text-gray-500"
+                                                    icon={<PlusOutlined />}
+                                                    onClick={() => setCreateTask({ listId: list.id, title: "" })}
+                                                >
+                                                    {t("add-a-card")}
+                                                </Button>
+                                                <DeleteOutlined
+                                                    className="!text-red-500 mr-2 cursor-pointer"
+                                                    onClick={() => handleDeleteList(list.id)}
+                                                />
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
                         ))}
 
-                        <div className="w-72 flex-shrink-0">
-                            <div className="bg-gray-200 rounded-lg h-16 flex items-center px-3 justify-center">
-                                <Button type="text" icon={<PlusOutlined />}>
-                                    {t("add-another-list")}
-                                </Button>
+                        <div className="w-72 h-fit">
+                            <div className="bg-gray-200 rounded-lg flex items-center p-3 justify-center h-fit">
+                                {createList.isShow && (
+                                    <Space direction="vertical">
+                                        <Input
+                                            value={createList.data}
+                                            placeholder={t("name-new-list")}
+                                            onChange={(e) => setCreateList({ ...createList, data: e.target.value })}
+                                        />
+
+                                        <Space direction="horizontal">
+                                            <Button color="primary" variant="solid" onClick={handleAddList}>
+                                                {t("add-list")}
+                                            </Button>
+                                            <CloseOutlined
+                                                className="cursor-pointer"
+                                                onClick={() => setCreateList({ ...createList, isShow: false })}
+                                            />
+                                        </Space>
+                                    </Space>
+                                )}
+                                {!createList.isShow && (
+                                    <Button type="text" onClick={() => setCreateList({ ...createList, isShow: !createList.isShow })}>
+                                        <Space direction="horizontal">
+                                            <PlusOutlined />
+                                            {t("add-another-list")}
+                                        </Space>
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -186,8 +387,10 @@ const BoardMain: React.FC = () => {
             </div>
 
             <ModalCloseBoard open={isModalCloseOpen} onCancel={() => handleModalClose(false)} onOk={() => handleModalClose(true)} />
+            <ModalCloseBoard open={isModalDeleteListOpen} onCancel={() => handleModalDeleteList(false)} onOk={() => handleModalDeleteList(true)} />
             <FilterBoard open={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
-            <ModalDetailsCard open={isEditCardOpen} onCancel={() => setIsEditCardOpen(false)} />
+            <ModalDetailsCard open={isEditCardOpen} task={selectedTask} onCancel={() => setIsEditCardOpen(false)} />
+            <ModalInfoTask open={isInfoTaskOpen} task={selectedTask} onClose={() => setIsInfoTaskOpen(false)} />
         </>
     );
 };

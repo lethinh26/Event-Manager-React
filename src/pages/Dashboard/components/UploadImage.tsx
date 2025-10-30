@@ -9,7 +9,7 @@ type PropsType = {
     setUrlImage: (url: string | null) => void;
 };
 
-const UploadImage = ({ imageUrl, setUrlImage }: PropsType) => {
+const UploadImage = ({ imageUrl, setUrlImage }: PropsType) => {    
     const { t } = useTranslation();
     const [fileList, setFileList] = useState<UploadFile[]>([]);
 
@@ -53,7 +53,7 @@ const UploadImage = ({ imageUrl, setUrlImage }: PropsType) => {
     // upload ảnh -> qua thẻ uplaod -> Upload gọi uploadImage(error, success) ->  xong Upload nhận onChange
     return (
         <div>
-            <Form.Item name="uploadedImage" valuePropName="fileList">
+            <Form.Item>
                 <Upload
                     accept="image/*"
                     listType="picture-card"

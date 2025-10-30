@@ -57,7 +57,7 @@
   "boar": "Cột",
   "table": "Bảng",
   "add-a-card": "Thêm thẻ",
-  "add-another-list": "Thêm một danh sách khác",
+  "add-another-list": "Thêm danh sách",
   "keyword": "Từ khóa",
   "enter-a-keyword": "Nhập từ khóa...",
   "card-status": "Trạng thái thẻ",
@@ -96,5 +96,16 @@
   "update": "Cập nhật",
   "upload-failed": "Tải lên không thành công",
   "upload-successful": "Tải lên thành công",
-  "please-select-a-background-or-color": "Vui lòng chọn nền hoặc màu sắc"
+  "please-select-a-background-or-color": "Vui lòng chọn nền hoặc màu sắc",
+  "add-list": "Thêm danh sách",
+  "name-new-list": "Đặt tên cho danh sách mới",
+  "board-closed-successfully": "Đóng bảng thành công",
+  "failed-to-close-board": "Không thể đóng bảng",
+  "enter-card-title": "Nhập tiêu đề thẻ...",
+  "add-card": "Thêm thẻ",
+  "card-moved-successfully": "Di chuyển thẻ thành công",
+  "failed-to-move-card": "Không thể di chuyển thẻ",
+  "list-deleted-successfully": "Xóa danh sách thành công",
+  "no-description": "Chưa có mô tả",
+  "saved-successfully": "Lưu thành công"
 }

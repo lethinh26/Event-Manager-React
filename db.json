@@ -13,11 +13,11 @@
       "id": "1672dc1b-cc4a-4449-978a-f6fe1c1acd62",
       "user_id": "bf19faee-7fba-4362-9861-0d8914248748",
       "title": "drhrdehswh",
-      "backdrop": "./src/assets/board-default1.jpg",
-      "color": "#EAB308",
+      "backdrop": "./src/assets/board-default2.jpg",
+      "color": null,
       "is_starred": false,
       "is_closed": false,
-      "created_at": "2025-10-28T14:19:39.024Z"
+      "created_at": "2025-10-30T07:14:27.100Z"
     },
     {
       "id": "ccd02871-3bdc-429f-b250-3133e9f171e8",
@@ -55,11 +55,60 @@
       "title": "gegw",
       "backdrop": null,
       "color": "#E11D48",
-      "is_starred": false,
+      "is_starred": true,
       "is_closed": false,
       "created_at": "2025-10-29T02:28:15.520Z"
+    },
+    {
+      "id": "ed41c3ee-96fa-490f-bf85-bb977faa9921",
+      "user_id": "bf19faee-7fba-4362-9861-0d8914248748",
+      "title": "fwefw",
+      "backdrop": "./src/assets/board-default2.jpg",
+      "color": null,
+      "is_starred": true,
+      "is_closed": false,
+      "created_at": "2025-10-30T01:57:01.466Z"
+    },
+    {
+      "id": "895814e3-2c3d-4a83-bd1b-12419aaa1bf2",
+      "user_id": "bf19faee-7fba-4362-9861-0d8914248748",
+      "title": "dgverg",
+      "backdrop": null,
+      "color": "#22D3EE",
+      "is_starred": false,
+      "is_closed": true,
+      "created_at": "2025-10-30T06:20:33.255Z"
+    },
+    {
+      "id": "25b33b7c-d8d0-4098-acac-d04c99fb85dd",
+      "user_id": "bf19faee-7fba-4362-9861-0d8914248748",
+      "title": "reger",
+      "backdrop": "./src/assets/board-default2.jpg",
+      "color": null,
+      "is_starred": false,
+      "is_closed": false,
+      "created_at": "2025-10-30T06:22:07.358Z"
     }
   ],
-  "lists": [],
-  "tasks": []
+  "lists": [
+    {
+      "id": "302c9f6a-baee-4c73-9aba-5f6fdf73c1fb",
+      "board_id": "1672dc1b-cc4a-4449-978a-f6fe1c1acd62",
+      "title": "frgreg",
+      "created_at": "2025-10-30T07:12:57.257Z"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "6ed63c22-3b39-4bce-8136-011a2ef85989",
+      "list_id": "302c9f6a-baee-4c73-9aba-5f6fdf73c1fb",
+      "title": "fejkbfwe",
+      "description": "<p>Nhập m&ocirc; tả tại đ&acirc;y</p>",
+      "status": false,
+      "position": 0,
+      "due_date": null,
+      "created_at": "2025-10-30T16:23:16.697Z"
+    }
+  ],
+  "tags": []
 }

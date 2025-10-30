@@ -97,5 +97,16 @@
   "update": "Update",
   "upload-failed": "Upload failed",
   "upload-successful": "Upload successful",
-  "please-select-a-background-or-color": "Please select a background or color"
+  "please-select-a-background-or-color": "Please select a background or color",
+  "name-new-list": "Name new list",
+  "add-list": "Add List",
+  "board-closed-successfully": "Board closed successfully",
+  "failed-to-close-board": "Failed to close board",
+  "enter-card-title": "Enter card title...",
+  "add-card": "Add Card",
+  "card-moved-successfully": "Card moved successfully",
+  "failed-to-move-card": "Failed to move card",
+  "list-deleted-successfully": "List deleted successfully",
+  "no-description": "No description available",
+  "saved-successfully": "Saved successfully"
 }

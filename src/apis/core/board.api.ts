@@ -19,9 +19,7 @@ export interface DataType {
 
 export const boardApi = {
     get: async <T extends LocationType>(location: T, idLocation: IdType[T], id: string) => {
-        const res = await axios.get(`${import.meta.env.VITE_DB_URL}/${location}?${idLocation}=${id}`);
-        console.log("res_Data",res.data);
-        
+        const res = await axios.get(`${import.meta.env.VITE_DB_URL}/${location}?${idLocation}=${id}`);        
         return res.data;
     },
 
@@ -30,8 +28,10 @@ export const boardApi = {
         return res.data;
     },
 
-    update: async <T extends LocationType>(location: T, id: string, data: DataType[T]) => {
-        const res = await axios.put(`${import.meta.env.VITE_DB_URL}/${location}/${id}`, data);
+    update: async <T extends LocationType>(location: T, id: string, data: Partial<DataType[T]>) => {
+        const res = await axios.patch(`${import.meta.env.VITE_DB_URL}/${location}/${id}`, data);
+        console.log(res);
+        
         return res.data;
     },
 

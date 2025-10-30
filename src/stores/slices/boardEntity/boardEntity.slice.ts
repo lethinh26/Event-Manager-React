@@ -38,15 +38,17 @@ const boardEntitySlice = createSlice({
             switch (location) {
                 case "boards":
                     boardAdapter.setAll(state.boards, data as BoardType[]);
+                    state.loading = false;
+                    state.initialized = true;
                     break;
                 case "lists":
-                    listAdapter.setAll(state.lists, data as ListType[]);
+                    listAdapter.upsertMany(state.lists, data as ListType[]);                    
                     break;
                 case "tasks":
-                    taskAdapter.setAll(state.tasks, data as TaskType[]);
+                    taskAdapter.upsertMany(state.tasks, data as TaskType[]);
                     break;
                 case "tags":
-                    tagAdapter.setAll(state.tags, data as TagType[]);
+                    tagAdapter.upsertMany(state.tags, data as TagType[]);
                     break;
                 default:
                     console.warn("Lỗi location", location);
@@ -97,50 +99,59 @@ const boardEntitySlice = createSlice({
             const { location, data } = action.payload;
             switch (location) {
                 case "boards":
-                    boardAdapter.upsertOne(state.boards, data as BoardType);
+                    boardAdapter.updateOne(state.boards, {id: data.id, changes: data as Partial<BoardType>});
                     break;
                 case "lists":
-                    listAdapter.upsertOne(state.lists, data as ListType);
+                    listAdapter.updateOne(state.lists, {id: data.id, changes: data as Partial<ListType>});
                     break;
                 case "tasks":
-                    taskAdapter.upsertOne(state.tasks, data as TaskType);
+                    taskAdapter.updateOne(state.tasks, {id: data.id, changes: data as Partial<TaskType>})
                     break;
                 case "tags":
-                    tagAdapter.upsertOne(state.tags, data as TagType);
+                    tagAdapter.updateOne(state.tags, {id: data.id, changes: data as Partial<TagType>})
                     break;
                 default:
                     console.warn("Lỗi location", location);
             }
         });
 
-        b.addMatcher(
-            (action) => action.type.endsWith("/pending"),
-            (state) => {
+        b.addCase(thunkGet.pending, (state, action) => {
+            if (action.meta.arg.location === "boards") {
                 state.loading = true;
-                state.error = null;
             }
-        );
+            state.error = null;
+        });
 
-        b.addMatcher(
-            (action) => action.type.endsWith("/fulfilled") && action.type.startsWith("boardEntity/"),
-            (state) => {
-                state.loading = false;
-            }
-        );
+        b.addCase(thunkGet.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error?.message ?? "Failed fetch";
+        });
 
-        b.addMatcher(
-            (action) => action.type.endsWith("/rejected"),
-            (state, action: any) => {
-                state.loading = false;
-                state.error = action.error?.message ?? "errorrrrwdaw ";
-            }
-        );
+        b.addCase(thunkPost.rejected, (state, action) => {
+            state.error = action.error?.message ?? "Failed create";
+        });
+
+        b.addCase(thunkUpdate.rejected, (state, action) => {
+            state.error = action.error?.message ?? "Failed update";
+        });
+
+        b.addCase(thunkDelete.rejected, (state, action) => {
+            state.error = action.error?.message ?? "Failed delete";
+        });
     },
 });
 
 const selectBoardEntity = (state: StoreType) => state.boardEntity;
 
-export const boardSelectors = boardAdapter.getSelectors<StoreType>((state) => selectBoardEntity(state).boards);
-export const selectAllBoards = boardSelectors.selectAll;
+const boardSelectors = boardAdapter.getSelectors<StoreType>((state) => selectBoardEntity(state).boards);
+const listSelectors = listAdapter.getSelectors<StoreType>((state) => selectBoardEntity(state).lists);
+const taskSelectors = taskAdapter.getSelectors<StoreType>((state) => selectBoardEntity(state).tasks);
+const tagSelectors = tagAdapter.getSelectors<StoreType>((state) => selectBoardEntity(state).tags);
+
+
+export const selectAllBoards = boardSelectors.selectAll
+export const selectAllLists = listSelectors.selectAll
+export const selectAllTasks = taskSelectors.selectAll
+export const selectAllTags = tagSelectors.selectAll
 
 export const boardEntityReducer = boardEntitySlice.reducer;

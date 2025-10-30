@@ -1,33 +1,24 @@
 import { EditOutlined, StarOutlined, UnorderedListOutlined } from "@ant-design/icons";
 import { Button, Select } from "antd";
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import useNotify from "../../hooks/useNotify";
-import { useSelector } from "react-redux";
-import type { StoreType } from "../../stores";
-import useAppDispatch from "../../hooks/useAppDispatch";
 import ModalCreateBoard from "./components/ModalCreateBoard";
-import { thunkFetchUser } from "../../stores/slices/user/user.thunk";
-import { thunkFetchBoards } from "../../stores/slices/board/board.thunk";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import type { BoardType } from "../../types/board.type";
+import { useBoard } from "../../hooks/useBoard";
 
 const DashboardHome = () => {
-    // notify / transale
     const { notify, contextHolder } = useNotify();
     const { t } = useTranslation();
 
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+    console.log(searchParams.get("filter"));
+    
 
     // reducer
-    const dispatch = useAppDispatch();
-    const user = useSelector((state: StoreType) => state.user.user);
-    const boards = useSelector((state: StoreType) => state.board);
-
-    useEffect(() => {
-        dispatch(thunkFetchUser());
-        dispatch(thunkFetchBoards(user?.id || ""));
-    }, [dispatch, user?.id]);
+    const board = useBoard();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editId, setEditId] = useState<string | null>(null);
@@ -53,18 +44,10 @@ const DashboardHome = () => {
         setIsModalOpen(false);
     };
 
-    const getBackground = (b: BoardType) =>
-        b.backdrop
-            ? {
-                  backgroundImage: `url(${b.backdrop})`,
-              }
-            : {
-                  backgroundColor: b.color || "#FFFFFF",
-              };
+    const getBackground = (b: BoardType) => (b.backdrop ? { backgroundImage: `url(${b.backdrop})` } : { backgroundColor: b.color || "#FFFFFF" });
 
-    return (
-        <div>
-            {contextHolder}
+    const boardJSX = (
+        <>
             <div className="flex justify-between">
                 <h1 className="font-bold text-3xl">
                     <UnorderedListOutlined /> {t("your-workspaces")}
@@ -79,15 +62,15 @@ const DashboardHome = () => {
             <hr className="my-4 text-gray-500" />
 
             <div className="flex gap-5 px-3 flex-wrap">
-                {boards.boards &&
-                    boards.boards
+                {board &&
+                    board
                         .filter((board) => !board.is_starred)
                         .map((b) => {
                             return (
                                 <div
                                     key={b.id}
                                     className={`rounded bg-cover bg-center w-[270px] h-[130px] relative overflow-hidden group cursor-pointer`}
-                                    style={{...getBackground(b)}}
+                                    style={{ ...getBackground(b) }}
                                     onClick={() => navigate(`/board/${b.id}`)}
                                 >
                                     <h1 className="absolute top-4 left-4 font-semibold stroke-neutral-500 shadow-gray-900 text-white text-shadow">
@@ -113,7 +96,11 @@ const DashboardHome = () => {
                     </Button>
                 </div>
             </div>
+        </>
+    );
 
+    const starBoard = (
+        <>
             <div className="flex justify-between mt-4">
                 <h1 className="font-bold text-3xl">
                     <StarOutlined /> {t("starred-boards")}
@@ -121,22 +108,26 @@ const DashboardHome = () => {
             </div>
 
             <hr className="my-4 text-gray-500" />
-
             <div className="flex gap-5 px-3 flex-wrap">
-                {boards.boards &&
-                    boards.boards
+                {board &&
+                    board
                         .filter((board) => board.is_starred)
                         .map((b) => {
                             return (
                                 <div
                                     key={b.id}
-                                    className={`rounded bg-[url('/${b.backdrop}')] bg-cover bg-center w-[270px] h-[130px] relative overflow-hidden group cursor-pointer`}
+                                    className={`rounded bg-cover bg-center w-[270px] h-[130px] relative overflow-hidden group cursor-pointer`}
+                                    style={{ ...getBackground(b) }}
+                                    onClick={() => navigate(`/board/${b.id}`)}
                                 >
                                     <h1 className="absolute top-4 left-4 font-semibold stroke-neutral-500 shadow-gray-900 text-white text-shadow">
                                         {b.title}
                                     </h1>
                                     <Button
-                                        onClick={() => showModalEdit(b.id)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            showModalEdit(b.id);
+                                        }}
                                         className="!bg-slate-800 !text-white !border-none absolute left-1/2 -translate-x-1/2 top-20 opacity-0 group-hover:opacity-100 transition-opacity"
                                     >
                                         <EditOutlined />
@@ -146,6 +137,15 @@ const DashboardHome = () => {
                             );
                         })}
             </div>
+        </>
+    );
+
+    return (
+        <div>
+            {contextHolder}
+            {searchParams.get("filter") === "board" && boardJSX}
+            {searchParams.get("filter") === "starBoard" && starBoard}
+            {!searchParams.get("filter") && <>{boardJSX} {starBoard}</>}
 
             <ModalCreateBoard open={isModalOpen} editId={editId} onCancel={handleModalCancel} onOk={handleModalOk}></ModalCreateBoard>
         </div>

@@ -27,7 +27,7 @@ const RegisterPage: React.FC = () => {
             }
         };
         checkLogin();
-    }, []);
+    }, [navigate]);
 
     const [form] = Form.useForm();
 

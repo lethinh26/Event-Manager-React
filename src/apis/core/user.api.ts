@@ -21,9 +21,7 @@ const userApi = {
     },
     
     checkIsLogin: async () => {
-        const remember = localStorage.getItem("remember") === "true";
-        console.log(remember);
-        
+        const remember = localStorage.getItem("remember") === "true";        
         const token = remember ? localStorage.getItem("token") : sessionStorage.getItem("token");
         const res = await decodeToken(token ?? "");
         return res ? true : false;

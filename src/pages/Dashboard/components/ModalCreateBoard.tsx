@@ -1,12 +1,13 @@
 import { Button, Form, Input, Modal, Radio, Space } from "antd";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import UploadImage from "./UploadImage";
 import { CheckOutlined } from "@ant-design/icons";
 import useAppDispatch from "../../../hooks/useAppDispatch";
-import { useSelector } from "react-redux";
 import type { StoreType } from "../../../stores";
-import { thunkPostBoard, thunkUpdateBoard } from "../../../stores/slices/board/board.thunk";
+import useAppSelector from "../../../hooks/useAppSelector";
+import { selectAllBoards } from "../../../stores/slices/boardEntity/boardEntity.slice";
+import { thunkPost, thunkUpdate } from "../../../stores/slices/boardEntity/boardEntity.thunk";
 
 type PropsType = {
     open: boolean;
@@ -23,8 +24,9 @@ type FormValues = {
 
 const ModalCreateBoard = ({ open, editId, onCancel, onOk }: PropsType) => {
     const dispatch = useAppDispatch();
-    const user = useSelector((state: StoreType) => state.user.user);
-    const board = useSelector((state: StoreType) => (editId ? state.board.boards?.find((b) => b.id === editId) : null));
+    const user = useAppSelector((state: StoreType) => state.user.user);
+    const board = useAppSelector(selectAllBoards);
+    const currentBoard = board.find((b) => b.id === editId);
 
     const { t } = useTranslation();
     const [form] = Form.useForm();
@@ -37,11 +39,6 @@ const ModalCreateBoard = ({ open, editId, onCancel, onOk }: PropsType) => {
 
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
 
-
-    useEffect(() => {
-        console.log(bgWatch);
-    }, [bgWatch]);
-
     useEffect(() => {
         if (uploadedImage !== null) {
             form.setFieldsValue({ background: uploadedImage });
@@ -49,21 +46,21 @@ const ModalCreateBoard = ({ open, editId, onCancel, onOk }: PropsType) => {
     }, [uploadedImage, form]);
 
     useEffect(() => {
-        if (editId && board) {
+        if (editId && currentBoard) {
             form.setFieldsValue({
-                title: board.title,
-                background: board.backdrop,
-                color: board.color,
+                title: currentBoard.title,
+                background: currentBoard.backdrop,
+                color: currentBoard.color,
             });
 
-            if (board.backdrop && !backgrounds.includes(board.backdrop)) {
-                setUploadedImage(board.backdrop);
+            if (currentBoard.backdrop && !backgrounds.includes(currentBoard.backdrop)) {
+                setUploadedImage(currentBoard.backdrop);
             }
         }
     }, [editId, board, form]);
 
     const onFinish = (values: FormValues) => {
-        const board = {
+        const newBoard = {
             id: crypto.randomUUID(),
             user_id: user?.id || "",
             title: values.title,
@@ -74,10 +71,10 @@ const ModalCreateBoard = ({ open, editId, onCancel, onOk }: PropsType) => {
             created_at: new Date().toISOString(),
         };
 
-        if (editId) {
-            dispatch(thunkUpdateBoard({ boardId: editId, data: board }));
+        if (editId) {            
+            dispatch(thunkUpdate({ location: "boards", id: editId, data: newBoard }));
         } else {
-            dispatch(thunkPostBoard(board));
+            dispatch(thunkPost({ location: "boards", data: newBoard }));
         }
 
         form.resetFields();

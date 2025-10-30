@@ -6,8 +6,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Outlet, useNavigate } from "react-router";
 import useNotify from "../../hooks/useNotify";
-import useAppSelector from "../../hooks/useAppSelector";
 import type { BoardType } from "../../types/board.type";
+import { useBoard } from "../../hooks/useBoard";
 
 type PropsType = {
     variant: "default" | "board";
@@ -19,7 +19,12 @@ const SideBar = ({ variant }: PropsType) => {
     const [collapsed, setCollapsed] = useState(false);
     const navigate = useNavigate();
 
-    const board = useAppSelector((state) => state.board.boards);
+    const board = useBoard();
+    
+    // useEffect(() => {
+    //     console.log(board);
+    // }, [board]);
+    
 
     const formatBackground = (b: BoardType) => {
         if (b.backdrop) {
@@ -98,10 +103,10 @@ const SideBar = ({ variant }: PropsType) => {
                     <Sider theme="dark" collapsible collapsed={collapsed} onCollapse={(set) => setCollapsed(set)} breakpoint="lg" width={240}>
                         <Menu mode="inline" defaultSelectedKeys={["1"]} defaultOpenKeys={["sub1"]} theme="dark">
                             <div className={`px-3 mt-5 ${collapsed && "hidden"}`}>{t("your-workspaces")}</div>
-                            <Menu.Item key={1} icon={<UnorderedListOutlined />} className="!mt-5" onClick={() => navigate("/dashboard")}>
+                            <Menu.Item key={1} icon={<UnorderedListOutlined />} className="!mt-5" onClick={() => navigate("/dashboard?filter=board")}>
                                 {t("boards")}
                             </Menu.Item>
-                            <Menu.Item key={2} icon={<StarOutlined />}>
+                            <Menu.Item key={2} icon={<StarOutlined />} onClick={() => navigate("/dashboard?filter=starBoard")}>
                                 {t("starred-boards")}
                             </Menu.Item>
                             <Menu.Item key={3} icon={<CloseSquareOutlined />}>
