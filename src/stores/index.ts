@@ -1,10 +1,11 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import { boardReducer } from "./slices/board/board.slice";
+// import { boardReducer } from "./slices/board/board.slice";
 import { userReducer } from "./slices/user/user.slice";
+import { boardEntityReducer } from "./slices/boardEntity/boardEntity.slice";
 
 const RootReducer = combineReducers({
     user: userReducer,
-    board: boardReducer,
+    boardEntity: boardEntityReducer,
 
 })
 
