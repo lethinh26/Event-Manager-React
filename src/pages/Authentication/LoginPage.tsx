@@ -18,7 +18,7 @@ const LoginPage: React.FC = () => {
         const checkLogin = async () => {
             const isLogin = await Api.user.checkIsLogin();
             if (isLogin) {
-                navigate("/dashboard");
+                navigate("/dashboard?filter=board");
             }
         };
         checkLogin();
@@ -31,7 +31,7 @@ const LoginPage: React.FC = () => {
             const noti = await Api.user.login(values);
             notify(true, noti);
             setTimeout(() => {
-                navigate("/dashboard");
+                navigate("/dashboard?filter=board");
             }, 1000);
         } catch (error) {
             notify(false, error as string);
@@ -52,7 +52,7 @@ const LoginPage: React.FC = () => {
                     <h1 className="text-4xl font-bold mb-2">Trello</h1>
                     <p className="text-center text-2xl mb-4 font-bold">{t("sign-in")}</p>
 
-                    <Form form={form} name="register" layout="vertical" onFinish={onFinish} onFinishFailed={onFinishFailed}>
+                    <Form form={form} name="login" layout="vertical" onFinish={onFinish} onFinishFailed={onFinishFailed}>
                         <Form.Item
                             label={t("email")}
                             name="email"

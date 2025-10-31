@@ -12,11 +12,12 @@ type PropsType = {
     open: boolean;
     onClose: () => void;
     task: TaskType | null;
+    setTitle: (title: string) => void
 };
 
 const { Title, Text } = Typography;
 
-const ModalMoveCard = ({ open, onClose, task }: PropsType) => {
+const ModalMoveCard = ({ open, onClose, task, setTitle}: PropsType) => {
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
     const { notify, contextHolder } = useNotify();
@@ -33,12 +34,23 @@ const ModalMoveCard = ({ open, onClose, task }: PropsType) => {
         }
     }, [task]);
 
+    const listTask = tasks.filter(list => list.list_id === selectListId)
     const listOptions = lists.map((list) => ({ label: list.title, value: list.id }));    
-    const positionOptions = tasks.filter(list => list.list_id === selectListId).length > 0 ? tasks.filter(task => task.list_id === selectListId).map((task, i) => ({label: i+1, value: i})) : [{label: 1, value: 1}]
+
+    const positionOptions: {label: string | number, value: number}[] = listTask.length > 0 ? listTask.map((task, i) => ({label: i+1, value: i})) : [{label: 1, value: 1}]
+
+    
+    // if (task!.position+1 !== listTask.length) {
+    //     positionOptions.unshift({label: t('top'), value: 0})
+    // }
+
+    // if (task!.position !== 1) {
+    //     positionOptions.push({label: t('bottom'), value: listTask.length})
+    // }
+
 
     const handleMove = async () => {
         if (!task) return;
-
         try {
             await dispatch(
                 thunkUpdate({
@@ -52,6 +64,7 @@ const ModalMoveCard = ({ open, onClose, task }: PropsType) => {
             );
 
             notify(true, t("card-moved-successfully"));
+            setTitle(lists.find(list => list.id === selectListId)?.title || "")
             onClose();
         } catch {
             notify(false, t("failed-to-move-card"));

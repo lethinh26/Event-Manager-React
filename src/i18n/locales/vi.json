@@ -107,5 +107,19 @@
   "failed-to-move-card": "Không thể di chuyển thẻ",
   "list-deleted-successfully": "Xóa danh sách thành công",
   "no-description": "Chưa có mô tả",
-  "saved-successfully": "Lưu thành công"
+  "saved-successfully": "Lưu thành công",
+  "bottom": "cuối",
+  "top": "đầu",
+  "apply": "Áp dụng",
+  "reset": "Đặt lại",
+  "title-cannot-be-empty": "Tiêu đề không được để trống",
+  "delete-board": "Xóa bảng",
+  "board-deleted-successfully": "Đã xóa bảng thành công",
+  "board-reopened-successfully": "Hội đồng đã mở lại thành công",
+  "reopen-board": "Mở lại bảng",
+  "select-language": "Chọn ngôn ngữ",
+  "please-select-a-date": "Vui lòng chọn ngày",
+  "date-updated-successfully": "Cập nhật ngày thành công",
+  "date-removed-successfully": "Đã xóa ngày thành công",
+  "selected-date": "Ngày đã chọn"
 }

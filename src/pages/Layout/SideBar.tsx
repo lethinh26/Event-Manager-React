@@ -4,7 +4,7 @@ import { Content } from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Outlet, useNavigate } from "react-router";
+import { Outlet, useLocation, useNavigate, useParams } from "react-router";
 import useNotify from "../../hooks/useNotify";
 import type { BoardType } from "../../types/board.type";
 import { useBoard } from "../../hooks/useBoard";
@@ -18,14 +18,13 @@ const SideBar = ({ variant }: PropsType) => {
     const { t } = useTranslation();
     const [collapsed, setCollapsed] = useState(false);
     const navigate = useNavigate();
+    // const []
+    const location = useLocation();
+    const { id } = useParams();
+    
 
     const board = useBoard();
     
-    // useEffect(() => {
-    //     console.log(board);
-    // }, [board]);
-    
-
     const formatBackground = (b: BoardType) => {
         if (b.backdrop) {
             if (b.backdrop.startsWith("./src")) {
@@ -38,7 +37,7 @@ const SideBar = ({ variant }: PropsType) => {
         }
 
         return {};
-    }
+    };
 
     const handleLogout = () => {
         notify(true, t("logged-out-successfully"));
@@ -49,6 +48,19 @@ const SideBar = ({ variant }: PropsType) => {
             window.location.href = "/login";
         }, 1000);
     };
+
+    const selectedKeys = (() => {
+        if (location.pathname.startsWith("/board/")) {
+            return [`${id}`];
+        } else if (location.search.includes("filter=starBoard")) {
+            return ["2"];
+        } else if (location.search.includes("filter=closedBoard")) {
+            return ["3"];
+        } else if (location.search.includes("filter=board")) {
+            return ["1"];
+        }
+        return [];
+    })();
 
     const items =
         variant === "default" ? (
@@ -66,7 +78,7 @@ const SideBar = ({ variant }: PropsType) => {
                     <div>{t("your-boards")}</div>
                     <PlusOutlined className="cursor-pointer" />
                 </div>
-                {board?.map((b) => {
+                {board?.filter(b => !b.is_closed).map((b) => {
                     return (
                         <Menu.Item key={b.id}>
                             <div className="flex items-center gap-2">
@@ -79,19 +91,6 @@ const SideBar = ({ variant }: PropsType) => {
                         </Menu.Item>
                     );
                 })}
-
-                {/* <Menu.Item key={"abc"}>
-                    <div className="flex items-center gap-2">
-                        <img src={imgTest} alt="" className="w-[24px] h-[20px]" />
-                        <span>Tổ chức sự kiện ...</span>
-                    </div>
-                </Menu.Item>
-                <Menu.Item key={"abc"}>
-                    <div className="flex items-center gap-2">
-                        <img src={imgTest} alt="" className="w-[24px] h-[20px]" />
-                        <span>Tổ chức sự kiện ...</span>
-                    </div>
-                </Menu.Item> */}
             </>
         );
 
@@ -101,15 +100,15 @@ const SideBar = ({ variant }: PropsType) => {
             <div className="h-[calc(100vh-48px)]">
                 <Layout className="h-[calc(100vh-48px)]">
                     <Sider theme="dark" collapsible collapsed={collapsed} onCollapse={(set) => setCollapsed(set)} breakpoint="lg" width={240}>
-                        <Menu mode="inline" defaultSelectedKeys={["1"]} defaultOpenKeys={["sub1"]} theme="dark">
+                        <Menu mode="inline" selectedKeys={selectedKeys} theme="dark">
                             <div className={`px-3 mt-5 ${collapsed && "hidden"}`}>{t("your-workspaces")}</div>
-                            <Menu.Item key={1} icon={<UnorderedListOutlined />} className="!mt-5" onClick={() => navigate("/dashboard?filter=board")}>
+                            <Menu.Item key="1" icon={<UnorderedListOutlined />} className="!mt-5" onClick={() => navigate("/dashboard?filter=board")}> 
                                 {t("boards")}
                             </Menu.Item>
-                            <Menu.Item key={2} icon={<StarOutlined />} onClick={() => navigate("/dashboard?filter=starBoard")}>
+                            <Menu.Item key="2" icon={<StarOutlined />} onClick={() => navigate("/dashboard?filter=starBoard")}> 
                                 {t("starred-boards")}
                             </Menu.Item>
-                            <Menu.Item key={3} icon={<CloseSquareOutlined />}>
+                            <Menu.Item key="3" icon={<CloseSquareOutlined />} onClick={() => navigate("/dashboard?filter=closedBoard")}> 
                                 {t("closed-boards")}
                             </Menu.Item>
                             <hr />

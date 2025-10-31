@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Card, Dropdown, Input, Radio, Space, Typography } from "antd";
 import type { MenuProps } from "antd";
 import {
@@ -31,13 +31,21 @@ import { thunkDelete, thunkGet, thunkPost, thunkUpdate } from "../../stores/slic
 
 const { Title, Text } = Typography;
 
-const BoardMain: React.FC = () => {
+export type FilterType = {
+    search?: string;
+    status?: string | boolean;
+    date?: string;
+};
+
+const BoardMain = () => {
     const navigate = useNavigate();
     const { id } = useParams();
     const dispatch = useAppDispatch();
     const board = useBoard();
     const lists: ListType[] = useAppSelector(selectAllLists);
     const tasks: TaskType[] = useAppSelector(selectAllTasks);
+    const [filterTaskList, setFilterTaskList] = useState<TaskType[] | null>(null);
+    const [currentFilter, setCurrentFilter] = useState<FilterType>({});
     const isLoading = useAppSelector((state) => state.boardEntity.loading);
 
     const [isStar, setIsStar] = useState<boolean>(false);
@@ -46,22 +54,19 @@ const BoardMain: React.FC = () => {
     const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
     const [isEditCardOpen, setIsEditCardOpen] = useState<boolean>(false);
     const [isInfoTaskOpen, setIsInfoTaskOpen] = useState<boolean>(false);
+
     const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
+
     const [editTitle, setEditTitle] = useState<string | null>(null);
     const [editCardId, setEditCardId] = useState<string | null>(null);
+
     const [selectedListId, setSelectedListId] = useState<string | null>(null);
+
     const [createList, setCreateList] = useState<{ isShow: boolean; data: string }>({ isShow: false, data: "" });
     const [createTask, setCreateTask] = useState<{ listId: string | null; title: string }>({ listId: null, title: "" });
 
     const { notify, contextHolder } = useNotify();
     const { t } = useTranslation();
-
-    const menu: MenuProps = {
-        items: [
-            { key: "1", label: t("edit") },
-            { key: "2", label: t("close") },
-        ],
-    };
 
     const toggleStar = () => {
         setIsStar((prev) => !prev);
@@ -79,7 +84,7 @@ const BoardMain: React.FC = () => {
             try {
                 await dispatch(thunkUpdate({ location: "boards", id: currentBoard.id, data: { is_closed: true } }));
                 notify(true, t("board-closed-successfully"));
-                setTimeout(() => navigate("/dashboard"), 1000);
+                setTimeout(() => navigate("/dashboard?filter=board"), 1000);
             } catch {
                 notify(false, t("failed-to-close-board"));
             }
@@ -100,18 +105,24 @@ const BoardMain: React.FC = () => {
         setIsModalDeleteListOpen(false);
     };
 
-    const handleEditTitle = (id: string) => setEditTitle(id);
-
-    const handleEditCard = (taskId: string) => setEditCardId(taskId);
-
-    const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>, listId: string) => {
-        const newTitle = e.target.value;
+    const handleTitleChange = (listId: string, newTitle: string) => {
+        if (newTitle.trim() === "") {
+            notify(false, t("title-cannot-be-empty"));
+            setEditTitle(null);
+            return;
+        }
         dispatch(thunkUpdate({ location: "lists", id: listId, data: { title: newTitle } }));
+        setEditTitle(null);
     };
 
-    const handleTaskTitleChange = (e: React.ChangeEvent<HTMLInputElement>, taskId: string) => {
-        const newTitle = e.target.value;
+    const handleTaskTitleChange = (taskId: string, newTitle: string) => {
+        if (newTitle.trim() === "") {
+            notify(false, t("title-cannot-be-empty"));
+            setEditCardId(null);
+            return;
+        }
         dispatch(thunkUpdate({ location: "tasks", id: taskId, data: { title: newTitle } }));
+        setEditCardId(null);
     };
 
     const handleAddList = () => {
@@ -160,6 +171,55 @@ const BoardMain: React.FC = () => {
         setIsInfoTaskOpen(true);
     };
 
+    const applyFilter = (values: FilterType, tasksList: TaskType[]) => {
+        let filteredTasks = [...tasksList];
+
+        if (values.search) {
+            filteredTasks = filteredTasks.filter((task) => task.title.toLowerCase().includes(values.search!.toLowerCase()));
+        }
+
+        if (values.status !== undefined && typeof values.status === "boolean") {
+            filteredTasks = filteredTasks.filter((task) => task.status === values.status);
+        }
+
+        if (values.date) {
+            const now = new Date();
+            if (values.date === "notDate") {
+                filteredTasks = filteredTasks.filter((task) => !task.due_date);
+            } else if (values.date === "overDate") {
+                filteredTasks = filteredTasks.filter((task) => task.due_date && new Date(task.due_date) < now);
+            } else if (values.date === "dueTmrDate") {
+                const tomorrow = new Date();
+                tomorrow.setDate(now.getDate() + 1);
+                tomorrow.setHours(0, 0, 0, 0);
+
+                const dayAfterTomorrow = new Date(tomorrow);
+                dayAfterTomorrow.setDate(tomorrow.getDate() + 1);
+
+                filteredTasks = filteredTasks.filter(
+                    (task) => task.due_date && new Date(task.due_date) >= tomorrow && new Date(task.due_date) < dayAfterTomorrow
+                );
+            }
+        }
+
+        return filteredTasks;
+    };
+
+    const handleFilter = (values: FilterType) => {
+        if (!values.search && values.status === undefined && !values.date) {
+            setFilterTaskList(null);
+            setCurrentFilter({});
+            setIsFilterOpen(false);
+            return;
+        }
+
+        setCurrentFilter(values);
+        const filteredTasks = applyFilter(values, tasks);
+        setFilterTaskList(filteredTasks);
+        setIsFilterOpen(false);
+    };
+
+    // init redux
     useEffect(() => {
         if (id) {
             dispatch(thunkGet({ location: "lists", idLocation: "board_id", id }));
@@ -183,8 +243,15 @@ const BoardMain: React.FC = () => {
     }, [tasks.length, dispatch]);
 
     useEffect(() => {
+        if (filterTaskList !== null && Object.keys(currentFilter).length > 0) {
+            const newFilteredTasks = applyFilter(currentFilter, tasks);
+            setFilterTaskList(newFilteredTasks);
+        }
+    }, [tasks]);
+
+    useEffect(() => {
         if (!id) {
-            navigate("/dashboard");
+            navigate("/dashboard?filter=board");
         }
     }, [id, navigate]);
 
@@ -247,24 +314,22 @@ const BoardMain: React.FC = () => {
                             <div key={list.id} className="w-72 flex-shrink-0">
                                 <div className="bg-white rounded-lg shadow-sm p-3">
                                     <div className="flex items-center justify-between mb-2">
-                                        <Text strong onDoubleClick={() => handleEditTitle(list.id)}>
+                                        <Text strong onDoubleClick={() => setEditTitle(list.id)}>
                                             {editTitle === list.id ? (
                                                 <Input
-                                                    value={list.title}
-                                                    onChange={(e) => handleTitleChange(e, list.id)}
-                                                    onBlur={() => setEditTitle(null)}
+                                                    defaultValue={list.title}
+                                                    onBlur={(e) => handleTitleChange(list.id, e.target.value)}
+                                                    onPressEnter={(e) => handleTitleChange(list.id, e.currentTarget.value)}
+                                                    autoFocus
                                                 />
                                             ) : (
                                                 list.title
                                             )}
                                         </Text>
-                                        <Dropdown menu={menu} trigger={["click"]}>
-                                            <Button type="text" size="small" icon={<EllipsisOutlined />} />
-                                        </Dropdown>
                                     </div>
 
                                     <div className="space-y-3">
-                                        {tasks
+                                        {(filterTaskList || tasks)
                                             .filter((task) => task.list_id === list.id)
                                             .sort((a, b) => a.position - b.position)
                                             .map((task) => (
@@ -278,12 +343,12 @@ const BoardMain: React.FC = () => {
                                                                 icon={task.status ? <CheckOutlined /> : null}
                                                                 onClick={() => handleTaskStatus(task)}
                                                             />
-                                                            <div onDoubleClick={() => handleEditCard(task.id)}>
+                                                            <div onDoubleClick={() => setEditCardId(task.id)}>
                                                                 {editCardId === task.id ? (
                                                                     <Input
                                                                         defaultValue={task.title}
-                                                                        onChange={(e) => handleTaskTitleChange(e, task.id)}
-                                                                        onBlur={() => setEditCardId(null)}
+                                                                        onBlur={(e) => handleTaskTitleChange(task.id, e.target.value)}
+                                                                        onPressEnter={(e) => handleTaskTitleChange(task.id, e.currentTarget.value)}
                                                                         autoFocus
                                                                     />
                                                                 ) : (
@@ -359,6 +424,7 @@ const BoardMain: React.FC = () => {
                                             value={createList.data}
                                             placeholder={t("name-new-list")}
                                             onChange={(e) => setCreateList({ ...createList, data: e.target.value })}
+                                            autoFocus
                                         />
 
                                         <Space direction="horizontal">
@@ -388,7 +454,7 @@ const BoardMain: React.FC = () => {
 
             <ModalCloseBoard open={isModalCloseOpen} onCancel={() => handleModalClose(false)} onOk={() => handleModalClose(true)} />
             <ModalCloseBoard open={isModalDeleteListOpen} onCancel={() => handleModalDeleteList(false)} onOk={() => handleModalDeleteList(true)} />
-            <FilterBoard open={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
+            <FilterBoard open={isFilterOpen} onClose={() => setIsFilterOpen(false)} onOk={handleFilter} />
             <ModalDetailsCard open={isEditCardOpen} task={selectedTask} onCancel={() => setIsEditCardOpen(false)} />
             <ModalInfoTask open={isInfoTaskOpen} task={selectedTask} onClose={() => setIsInfoTaskOpen(false)} />
         </>

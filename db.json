@@ -6,88 +6,35 @@
       "email": "lephuthinh387@gmail.com",
       "password": "123456",
       "created_at": "2025-10-28T13:41:15.452Z"
+    },
+    {
+      "id": "924e41b6-5272-49df-8420-34633fbbbcf2",
+      "username": "thinhphandzs1tg",
+      "email": "thinhphandzs1tg@gmail.com",
+      "password": "123456789",
+      "created_at": "2025-10-31T03:26:56.472Z"
     }
   ],
   "boards": [
     {
       "id": "1672dc1b-cc4a-4449-978a-f6fe1c1acd62",
       "user_id": "bf19faee-7fba-4362-9861-0d8914248748",
-      "title": "drhrdehswh",
+      "title": "1",
       "backdrop": "./src/assets/board-default2.jpg",
       "color": null,
       "is_starred": false,
-      "is_closed": false,
+      "is_closed": true,
       "created_at": "2025-10-30T07:14:27.100Z"
     },
     {
-      "id": "ccd02871-3bdc-429f-b250-3133e9f171e8",
+      "id": "b818ba42-97d4-42bd-bd37-e5ec9f760126",
       "user_id": "bf19faee-7fba-4362-9861-0d8914248748",
-      "title": "fdbdsb",
-      "backdrop": "https://res.cloudinary.com/dvchtaibe/image/upload/v1761669177/berrwjnpvi0bcn8j6bzs.jpg",
-      "color": "#10B981",
-      "is_starred": false,
-      "is_closed": false,
-      "created_at": "2025-10-28T16:32:51.393Z"
-    },
-    {
-      "id": "8a730a4a-b08c-461c-94f2-542eed35b65b",
-      "user_id": "bf19faee-7fba-4362-9861-0d8914248748",
-      "title": "jhmnb ",
-      "backdrop": "upload",
-      "color": "#FF8A00",
-      "is_starred": false,
-      "is_closed": false,
-      "created_at": "2025-10-28T23:58:43.314Z"
-    },
-    {
-      "id": "b8bd60a9-1edf-4b5b-8f11-bae9de8908d3",
-      "user_id": "bf19faee-7fba-4362-9861-0d8914248748",
-      "title": "fdthjtrh",
-      "backdrop": "https://res.cloudinary.com/dvchtaibe/image/upload/v1761697290/bqr8d2i2afzuf1hmyeux.jpg",
-      "color": "#E11D48",
-      "is_starred": false,
-      "is_closed": false,
-      "created_at": "2025-10-29T00:21:22.774Z"
-    },
-    {
-      "id": "3498ffcf-8579-42e2-a234-fcec61776858",
-      "user_id": "bf19faee-7fba-4362-9861-0d8914248748",
-      "title": "gegw",
-      "backdrop": null,
-      "color": "#E11D48",
-      "is_starred": true,
-      "is_closed": false,
-      "created_at": "2025-10-29T02:28:15.520Z"
-    },
-    {
-      "id": "ed41c3ee-96fa-490f-bf85-bb977faa9921",
-      "user_id": "bf19faee-7fba-4362-9861-0d8914248748",
-      "title": "fwefw",
-      "backdrop": "./src/assets/board-default2.jpg",
+      "title": "dgs",
+      "backdrop": "./src/assets/board-default1.jpg",
       "color": null,
-      "is_starred": true,
-      "is_closed": false,
-      "created_at": "2025-10-30T01:57:01.466Z"
-    },
-    {
-      "id": "895814e3-2c3d-4a83-bd1b-12419aaa1bf2",
-      "user_id": "bf19faee-7fba-4362-9861-0d8914248748",
-      "title": "dgverg",
-      "backdrop": null,
-      "color": "#22D3EE",
       "is_starred": false,
       "is_closed": true,
-      "created_at": "2025-10-30T06:20:33.255Z"
-    },
-    {
-      "id": "25b33b7c-d8d0-4098-acac-d04c99fb85dd",
-      "user_id": "bf19faee-7fba-4362-9861-0d8914248748",
-      "title": "reger",
-      "backdrop": "./src/assets/board-default2.jpg",
-      "color": null,
-      "is_starred": false,
-      "is_closed": false,
-      "created_at": "2025-10-30T06:22:07.358Z"
+      "created_at": "2025-10-31T18:22:36.579Z"
     }
   ],
   "lists": [
@@ -96,6 +43,18 @@
       "board_id": "1672dc1b-cc4a-4449-978a-f6fe1c1acd62",
       "title": "frgreg",
       "created_at": "2025-10-30T07:12:57.257Z"
+    },
+    {
+      "id": "7e1b4761-b8d2-4d63-8df8-0c0a7caacfa3",
+      "board_id": "1672dc1b-cc4a-4449-978a-f6fe1c1acd62",
+      "title": "bla bla",
+      "created_at": "2025-10-30T16:50:32.195Z"
+    },
+    {
+      "id": "4fe32508-5440-4456-82c5-999988e74977",
+      "board_id": "7bd13821-80c4-4caf-99b6-0b34a88a41c7",
+      "title": "tgtgg",
+      "created_at": "2025-10-31T07:58:46.011Z"
     }
   ],
   "tasks": [
@@ -108,6 +67,56 @@
       "position": 0,
       "due_date": null,
       "created_at": "2025-10-30T16:23:16.697Z"
+    },
+    {
+      "id": "49ab82af-37ef-44d1-89c8-4bdab85e16e6",
+      "list_id": "302c9f6a-baee-4c73-9aba-5f6fdf73c1fb",
+      "title": "uyfhvj",
+      "description": "<p>Nhập m&ocirc; tả tại đ&acirc;y</p>",
+      "status": false,
+      "position": 1,
+      "due_date": "2025-11-09T18:13:36.000Z",
+      "created_at": "2025-10-30T23:39:16.751Z"
+    },
+    {
+      "id": "2856df08-ee30-49a4-aafa-5eb61e468e3a",
+      "list_id": "302c9f6a-baee-4c73-9aba-5f6fdf73c1fb",
+      "title": "fewkjfk4",
+      "description": "",
+      "status": false,
+      "position": 2,
+      "due_date": null,
+      "created_at": "2025-10-30T23:50:19.703Z"
+    },
+    {
+      "id": "6ecef888-93b7-4067-a340-29acdf07734c",
+      "list_id": "302c9f6a-baee-4c73-9aba-5f6fdf73c1fb",
+      "title": "efikw",
+      "description": "<p>Nhập m&ocirc; tả tại đ&acirc;y</p>",
+      "status": true,
+      "position": 0,
+      "due_date": "2025-11-01T18:12:43.000Z",
+      "created_at": "2025-10-31T01:01:21.090Z"
+    },
+    {
+      "id": "c89fca2e-a2a5-4e06-8cf6-3bb8c6380887",
+      "list_id": "4fe32508-5440-4456-82c5-999988e74977",
+      "title": "tgtgg",
+      "description": "",
+      "status": false,
+      "position": 0,
+      "due_date": null,
+      "created_at": "2025-10-31T07:58:50.437Z"
+    },
+    {
+      "id": "8f8195ca-dcd6-44f5-900f-664b69d91145",
+      "list_id": "4fe32508-5440-4456-82c5-999988e74977",
+      "title": "tgtgg",
+      "description": "",
+      "status": false,
+      "position": 1,
+      "due_date": null,
+      "created_at": "2025-10-31T07:58:55.030Z"
     }
   ],
   "tags": []

@@ -23,7 +23,7 @@ const RegisterPage: React.FC = () => {
         const checkLogin = async () => {
             const isLogin = await Api.user.checkIsLogin();
             if (isLogin) {
-                navigate("/dashboard");
+                navigate("/dashboard?filter=board");
             }
         };
         checkLogin();

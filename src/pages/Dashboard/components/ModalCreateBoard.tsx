@@ -59,6 +59,12 @@ const ModalCreateBoard = ({ open, editId, onCancel, onOk }: PropsType) => {
         }
     }, [editId, board, form]);
 
+    useEffect(() => {
+        if (!form.getFieldValue("background") && !form.getFieldValue("color")) {
+            form.setFieldsValue({ background: backgrounds[0] });
+        }
+    }, [form]);
+
     const onFinish = (values: FormValues) => {
         const newBoard = {
             id: crypto.randomUUID(),
@@ -122,16 +128,6 @@ const ModalCreateBoard = ({ open, editId, onCancel, onOk }: PropsType) => {
                     <Form.Item
                         label={t("background")}
                         name="background"
-                        rules={[
-                            {
-                                validator: (_, value) => {
-                                    if (value || form.getFieldValue("color")) {
-                                        return Promise.resolve();
-                                    }
-                                    return Promise.reject(new Error(t('please-select-a-background-or-color')));
-                                },
-                            },
-                        ]}
                     >
                         <Radio.Group onChange={(e) => handleBackgroundChange(e.target.value)}>
                             <Space size="middle">
@@ -160,16 +156,6 @@ const ModalCreateBoard = ({ open, editId, onCancel, onOk }: PropsType) => {
                     <Form.Item
                         label={t("color")}
                         name="color"
-                        rules={[
-                            {
-                                validator: (_, value) => {
-                                    if (value || form.getFieldValue("background")) {
-                                        return Promise.resolve();
-                                    }
-                                    return Promise.reject(new Error(t("please-select-a-background-or-color")));
-                                },
-                            },
-                        ]}
                     >
                         <Radio.Group onChange={(e) => handleColorChange(e.target.value)}>
                             <Space size="small">

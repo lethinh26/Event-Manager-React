@@ -9,7 +9,7 @@ type PropsType = {
     onCancel: () => void;
 };
 
-const ModalCloseBoard: React.FC<PropsType> = ({ open, onOk, onCancel }) => {
+const ModalCloseBoard = ({ open, onOk, onCancel }: PropsType) => {
     const { t } = useTranslation();
 
     return (

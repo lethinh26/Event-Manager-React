@@ -108,5 +108,19 @@
   "failed-to-move-card": "Failed to move card",
   "list-deleted-successfully": "List deleted successfully",
   "no-description": "No description available",
-  "saved-successfully": "Saved successfully"
+  "saved-successfully": "Saved successfully",
+  "bottom": "bottom",
+  "top": "top",
+  "apply": "Apply",
+  "reset": "Reset",
+  "title-cannot-be-empty": "Title cannot be empty",
+  "board-deleted-successfully": "Board deleted successfully",
+  "delete-board": "Delete Board",
+  "reopen-board": "Reopen Board",
+  "board-reopened-successfully": "Board reopened successfully",
+  "select-language": "Select Language",
+  "please-select-a-date": "Please select a date",
+  "date-updated-successfully": "Date updated successfully",
+  "date-removed-successfully": "Date removed successfully",
+  "selected-date": "Selected Date"
 }
